@@ -60,6 +60,8 @@ button:focus {
 
 .tab {
     margin: 10px;
+    overflow: hidden;
+    animation: rollOutEffect 2s;
 }
 
 .card {
@@ -75,4 +77,10 @@ button:focus {
 
 #litTab {
     display: none;
+}
+
+/* Go from zero to full opacity */
+@keyframes rollOutEffect {
+    from {max-height: 0}
+    to {max-height: 800px;}
 }

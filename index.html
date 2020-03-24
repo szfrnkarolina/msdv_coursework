@@ -5,7 +5,7 @@
     <title>MSDV Coursework 2</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lato"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css"/>
     <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
@@ -13,27 +13,44 @@
 <div class="container-fluid">
     <div class="row topbar d-flex">
         <div class="pageTitle mr-auto">
-            1751072&nbsp; | &nbsp;<b>Socio-demographic factors and anxiety prevalence</b>
+            1751072&nbsp; | &nbsp;Socio-demographic factors and anxiety prevalence
         </div>
         <div class="navigation">
-            <button>home</button>
-            <button>report</button>
-            <button>literature</button>
+            <button class="navLink active" onclick="openTab(event, 'homeTab')">home</button>
+            <button class="navLink" onclick="openTab(event, 'reportTab')">report</button>
+            <button class="navLink" onclick="openTab(event, 'litTab')">literature</button>
         </div>
     </div>
 
     <div id="homeTab" class="row no-gutters tab mt-4">
         <div class="col col-md-7 pr-4">
             <div class="card">
-                <h5 class="card-title">Average anxiety level chart</h5>
+                <h6 class="card-title">Average anxiety level chart</h6>
             </div>
         </div>
         <div class="col col-md">
             <div class="card">
-                <h5 class="card-title">Options</h5>
+                <h6 class="card-title">Options</h6>
             </div>
         </div>
     </div>
+
+    <div id="reportTab" class="row no-gutters tab mt-4">
+        <div class="col">
+            <div class="card">
+                <h6 class="card-title">Visualisation report</h6>
+            </div>
+        </div>
+    </div>
+
+    <div id="litTab" class="row no-gutters tab mt-4">
+        <div class="col">
+            <div class="card">
+                <h6 class="card-title">Literature resources</h6>
+            </div>
+        </div>
+    </div>
+
 </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -45,5 +62,5 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
-<!--<script src="run.js" charset="utf-8"></script>-->
+<script src="assets/js/script.js" charset="utf-8"></script>
 </html>

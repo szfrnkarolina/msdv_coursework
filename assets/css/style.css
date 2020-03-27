@@ -84,3 +84,13 @@ button:focus {
     from {max-height: 0}
     to {max-height: 800px;}
 }
+
+.bar {
+    fill: darkcyan;
+}
+
+.custom-control-label::before {
+    top: -1px;
+    width: 1.2em;
+    height: 1.2em;
+}

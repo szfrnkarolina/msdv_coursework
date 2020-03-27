@@ -1,5 +1,4 @@
 ﻿group,subgroup,very low,low,medium,high,average
-united kingdom,,39.83,23.23,16.88,20.06,2.93
 sex
 ,men,40.61,24.62,16.51,18.27,2.80
 ,women,39.08,21.90,17.25,21.78,3.05
@@ -27,7 +26,7 @@ ethnicity
 ,bangladeshi,41.66,21.12,17.96,19.26,2.87
 ,chinese,35.13,28.34,19.65,16.88,2.89
 ,other asian,36.31,23.46,18.62,21.62,3.14
-,black/african/caribbean/black british,39.35,21.79,18.45,20.41,3.01
+,black,39.35,21.79,18.45,20.41,3.01
 ,arab,31.39,22.57,23.97,22.08,3.36
 ,other ethnic group,35.14,24.29,19.27,21.31,3.14
 self reported health
@@ -63,7 +62,7 @@ reasons for part-time work
 ,could not find full-time job,37.26,22.35,19.46,20.93,3.10
 ,did not want full-time job,40.57,24.08,16.80,18.55,2.83
 religion
-,no Religion ,39.60,24.11,16.76,19.53,2.90
+,no religion ,39.60,24.11,16.76,19.53,2.90
 ,christian,40.42,22.58,16.81,20.19,2.92
 ,buddhist ,35.59,24.86,17.09,22.46,3.09
 ,hindu ,35.01,24.44,20.31,20.24,3.11

@@ -3,6 +3,7 @@
     --card-bg-color: #fff;
     --text-color: #2e2e2e;
     --accent-color: #78CDD7;
+    --accent2-color: #F25757;
     --link-color: #666c6d;
     --hover-color: #a4afb0;
 }
@@ -105,6 +106,10 @@ svg text {
 
 .bar {
     fill: var(--accent-color);
+}
+
+.bar.more:hover {
+    cursor: pointer;
 }
 
 .custom-control {

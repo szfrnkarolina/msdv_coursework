@@ -58,10 +58,11 @@ function plot(set) {
         .attr('class', 'tooltip')
         .style("visibility", "hidden");
 
-    update(set)
+    update(set, "sex");
 }
 
-function update(set) {
+function update(set, setName) {
+    current = setName;
     // Update the X axis
     x.domain(set.map((d) => {return d.subgroup}));
     xAxis.call(d3.axisBottom(x));
@@ -74,17 +75,46 @@ function update(set) {
     let attachData = svg.selectAll("rect").data(set);
     attachData
         .join("rect")
+        .on("click", d => expand(d))
         .on("mouseover", d => {showTooltip(d.subgroup, d.average); showDistribution(d)})
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
         .transition()
         .duration(3000)
-        .attr("class", "bar")
+        .attr("class", d => {
+            if (d.subgroup === "inactive" || d.subgroup === "part time") {
+                return "bar more"
+            } else {
+                return "bar"
+            }
+        })
         .attr("x", d => x(d.subgroup))
         .attr("y", d => y(d.average))
         .attr("width", x.bandwidth())
-        .attr("height", d => barHeight - y(d.average));
+        .attr("height", d => barHeight - y(d.average))
+        .attr("stroke", "#F25757")
+        .attr("stroke-width", d => {
+            if (d.subgroup === "inactive" || d.subgroup === "part time") {
+                return "2px"
+            } else return "0px"
+        });
 
+}
+
+function expand(d) {
+    let setName = "";
+    let radios = document.getElementsByClassName("custom-radio");
+    let input;
+    console.log(radios);
+    if (d.subgroup === "inactive"){
+        setName = "reason for economic inactivity";
+        input = radios[6];
+    } else if (d.subgroup === "part time") {
+        setName = "reasons for part-time work";
+        input = radios[8];
+    }
+    input.getElementsByTagName("input")[0].checked = true;
+    update(groups[setName], setName)
 }
 
 function showDistribution(d) {
@@ -226,6 +256,7 @@ function createRadioButtons(list) {
 
         input.checked = (d === current);
         radio.className = "custom-control custom-radio";
+        if (d.includes("reason")) {radio.className += " ml-4"}
         input.className = "custom-control-input";
         input.type = "radio";
         input.id = "radio" + i;

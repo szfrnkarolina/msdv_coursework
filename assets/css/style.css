@@ -182,6 +182,10 @@ svg text {
     color: var(--card-bg-color);
 }
 
+.xAxisBar text {
+    font-size: 0.8em;
+}
+
 @keyframes rollOutEffect {
     from {max-height: 0}
     to {max-height: 800px;}

@@ -44,6 +44,7 @@ function plot(set) {
         .range([ 0, barWidth ])
         .padding(0.3);
     xAxis = svg.append("g")
+        .attr("class", "xAxisBar")
         .attr("transform", "translate(0," + barHeight + ")");
 
 
@@ -197,6 +198,11 @@ function plotBarDistribution(set) {
         .range([ pieHeight, 0]);
     yAxisD = svgD.append("g");
 
+    // Colour scale
+    let color = d3.scaleOrdinal()
+        .domain(set)
+        .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
+
     // Tooltip
     tooltipD = d3.select("#distributionCard")
         .append("div")
@@ -217,7 +223,7 @@ function plotBarDistribution(set) {
         .on("mouseover", d => showTooltip(d.name,(d.value + "%")))
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
-        .attr("class", "bar")
+        .attr('fill', d => { return(color(d.name)) })
         .attr("x", d => xD(d.name))
         .attr("y", d => yD(d.value))
         .attr("width", xD.bandwidth())

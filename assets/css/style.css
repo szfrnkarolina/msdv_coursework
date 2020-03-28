@@ -1,7 +1,17 @@
+:root {
+    --bg-color: #F9F9F9;
+    --card-bg-color: #fff;
+    --text-color: #2e2e2e;
+    --accent-color: #78CDD7;
+    --link-color: #666c6d;
+    --hover-color: #a4afb0;
+}
+
+
 body {
     font-family: 'Lato', sans-serif;
-    background-color: #F9F9F9;
-    color: #2e2e2e;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     font-size: 10px;
     line-height: 120%;
     letter-spacing: 1px;
@@ -34,11 +44,11 @@ svg text {
     margin: 10px;
     padding: 15px;
     border-radius: 5px;
-    background-color: #fff;
+    background-color: var(--card-bg-color);
 }
 
 .topbar button {
-    color: #666c6d;
+    color: var(--link-color);
     margin-left: 20px;
     text-transform:uppercase;
     font-size: 1em;
@@ -53,7 +63,7 @@ svg text {
 }
 
 .topbar button:hover {
-    color: #a4afb0;
+    color: var(--hover-color);
     cursor: pointer;
     transition-duration: 0.3s;
     -moz-transition-duration: 0.3s;
@@ -80,7 +90,7 @@ svg text {
 
 .card {
     border: none;
-    background-color: #fff;
+    background-color: var(--card-bg-color);
     border-radius: 5px;
     padding: 15px;
 }
@@ -93,14 +103,8 @@ svg text {
     display: none;
 }
 
-/* Go from zero to full opacity */
-@keyframes rollOutEffect {
-    from {max-height: 0}
-    to {max-height: 800px;}
-}
-
 .bar {
-    fill: darkcyan;
+    fill: var(--accent-color);
 }
 
 .custom-control {
@@ -108,7 +112,7 @@ svg text {
 }
 
 .custom-control-label:hover {
-    color: #a4afb0;
+    color: var(--hover-color);
     cursor: pointer;
     transition-duration: 0.3s;
     -moz-transition-duration: 0.3s;
@@ -134,7 +138,8 @@ svg text {
 }
 
 .custom-control-input:checked~.custom-control-label::before {
-    background-color: darkcyan;
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
 #options {
@@ -147,6 +152,11 @@ svg text {
     font-size: 1em;
     text-align: center;
     text-transform: capitalize;
-    background-color: #F9F9F9;
+    background-color: var(--bg-color);
     opacity: 0.8;
+}
+
+@keyframes rollOutEffect {
+    from {max-height: 0}
+    to {max-height: 800px;}
 }

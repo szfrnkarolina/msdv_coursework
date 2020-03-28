@@ -21,6 +21,15 @@ label {
     text-transform: capitalize;
 }
 
+svg text {
+    text-transform: capitalize;
+}
+
+.info {
+    font-size: 0.6em;
+    letter-spacing: 0;
+}
+
 .topbar {
     margin: 10px;
     padding: 15px;
@@ -130,4 +139,14 @@ label {
 
 #options {
     padding: 10px;
+}
+
+.tooltip {
+    padding: 5px;
+    width: 80px;
+    font-size: 1em;
+    text-align: center;
+    text-transform: capitalize;
+    background-color: #F9F9F9;
+    opacity: 0.8;
 }

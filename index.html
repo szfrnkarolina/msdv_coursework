@@ -22,20 +22,37 @@
         </div>
     </div>
 
-    <div id="homeTab" class="row no-gutters tab mt-4">
-        <div class="col col-md-8 pr-4">
-            <div id="chartCard" class="card">
-                <h6 class="card-title d-flex">
-                    <span class="mr-auto">Average anxiety level chart</span>
-                    <span class="info">Click on a bar to show distribution</span>
-                </h6>
-                <svg id="chartSvg" class="chart" height="400" width="100%"></svg>
+    <div id="homeTab" class="tab">
+        <div class="row no-gutters mt-4">
+            <div class="col col-md-8 pr-4">
+                <div id="chartCard" class="card">
+                    <h6 class="card-title">Average anxiety level chart</h6>
+                    <svg id="barSvg" class="chart" height="350" width="100%"></svg>
+                </div>
+            </div>
+            <div class="col col-md">
+                <div class="card">
+                    <h6 class="card-title">Options</h6>
+                    <div id="options"></div>
+                </div>
             </div>
         </div>
-        <div class="col col-md">
-            <div class="card">
-                <h6 class="card-title">Options</h6>
-                <div id="options" class="mt-2"></div>
+        <div class="row no-gutters mt-4">
+            <div class="col col-md-8 pr-4">
+                <div class="card">
+                    <h6 class="card-title">Legend</h6>
+                </div>
+            </div>
+            <div class="col col-md">
+                <div id="distributionCard" class="card">
+                    <h6 class="card-title" id="titleDistribution">Answer distribution</h6>
+                    <h6 id="toggleButtons" class="text-center">
+                        <button id="barToggle" class="buttonToggle left" disabled onclick="toggleDistribution(this)">Bar chart</button><!--
+                        --><button id="pieToggle" class="buttonToggle right" onclick="toggleDistribution(this)">Pie chart</button>
+                    </h6>
+                    <svg id="pieSvg" class="chart" height="300" width="100%"></svg>
+                    <svg id="barDSvg" class="chart" height="300" width="100%"></svg>
+                </div>
             </div>
         </div>
     </div>

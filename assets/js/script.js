@@ -1,12 +1,16 @@
 let groups = {};
 let current = "sex";
+let currentDistribution = {};
 let svg, x, y, xAxis, yAxis, tooltip;
+let svgD, xD, yD, xAxisD, yAxisD, tooltipD;
 
 // Get the dimensions and set margins
 let margin = 30,
-    width = document.getElementById("chartSvg").clientWidth - 2 * margin,
-    height = document.getElementById("chartSvg").clientHeight - 2 * margin;
-
+    marginD = 30,
+    barWidth = document.getElementById("barSvg").clientWidth - 2 * margin,
+    barHeight = document.getElementById("barSvg").clientHeight - 2 * margin,
+    pieWidth = document.getElementById("pieSvg").clientWidth - 2 * marginD,
+    pieHeight = document.getElementById("pieSvg").clientHeight - 2 * marginD;
 
 initiate();
 
@@ -23,26 +27,29 @@ function initiate() {
         createRadioButtons(Object.keys(groups));
         plot(groups[current]);
     });
+    document.getElementById("pieSvg").style.display = "none";
+    document.getElementById("toggleButtons").style.display = "none";
+
 }
 
 function plot(set) {
     // Select svg
-    svg = d3.select("#chartSvg")
+    svg = d3.select("#barSvg")
         .append("g")
         .attr("transform",
             "translate(" + margin + "," + margin + ")");
 
     // X axis
     x = d3.scaleBand()
-        .range([ 0, width ])
+        .range([ 0, barWidth ])
         .padding(0.3);
     xAxis = svg.append("g")
-        .attr("transform", "translate(0," + height + ")");
+        .attr("transform", "translate(0," + barHeight + ")");
 
 
     // Y axis
     y = d3.scaleLinear()
-        .range([ height, 0]);
+        .range([ barHeight, 0]);
     yAxis = svg.append("g");
 
     // Tooltip
@@ -67,7 +74,7 @@ function update(set) {
     let attachData = svg.selectAll("rect").data(set);
     attachData
         .join("rect")
-        .on("mouseover", d => mouseOver(d))
+        .on("mouseover", d => {showTooltip(d.subgroup, d.average); showDistribution(d)})
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
         .transition()
@@ -76,15 +83,122 @@ function update(set) {
         .attr("x", d => x(d.subgroup))
         .attr("y", d => y(d.average))
         .attr("width", x.bandwidth())
-        .attr("height", d => height - y(d.average));
+        .attr("height", d => barHeight - y(d.average));
 
 }
 
-function mouseOver(d) {
+function showDistribution(d) {
+    if (currentDistribution !== d) {
+        d3.select("#barDSvg").selectAll("*").remove();
+        d3.select("#pieSvg").selectAll("*").remove();
+        let distribution = [];
+        let keys = Object.keys(d);
+        for (let k in keys) {
+            if (keys[k] === "very low" || keys[k] === "low" || keys[k] === "medium" || keys[k] === "high") {
+                distribution.push({
+                    name: keys[k],
+                    value: d[keys[k]]
+                });
+            }
+        }
+        document.getElementById("toggleButtons").style.display = "block";
+        document.getElementById("titleDistribution").innerText = "Answer distribution: " + d.subgroup;
+        plotPieDistribution(distribution);
+        plotBarDistribution(distribution);
+        currentDistribution = d;
+    }
+
+}
+function plotPieDistribution(set) {
+    const radius = Math.min(pieWidth, pieHeight) / 2 ;
+
+    let svg = d3.select("#pieSvg")
+        .append("g")
+        .attr("transform", "translate(" + (pieWidth + 2*marginD) / 2 + "," + (pieHeight + 2*marginD) / 2 + ")");
+
+    // Colour scale
+    let color = d3.scaleOrdinal()
+        .domain(set)
+        .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
+
+    // Calculate pie chart
+    let pie = d3.pie().value(d => {return d.value; });
+    let arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+    // Draw piechart
+    svg
+        .selectAll('slices')
+        .data(pie(set))
+        .join('path')
+        .attr('d', arc)
+        .attr('fill', d => { return(color(d.data.name)) })
+        .attr("stroke", "#fff")
+        .style("stroke-width", "1px");
+
+    // Labels
+    svg
+        .selectAll('slices')
+        .data(pie(set))
+        .join('text')
+        .text(d => {return (d.data.name + " " + d.data.value + "%")})
+        .attr("transform", d => { return "translate(" + arc.centroid(d) + ")";  })
+        .style("text-anchor", "middle")
+        .style("fill", "#f9f9f9");
+}
+
+function plotBarDistribution(set) {
+    // Select svg
+    svgD = d3.select("#barDSvg")
+        .append("g")
+        .attr("transform",
+            "translate(" + (marginD + 20) + "," + marginD + ")");
+
+    // X axis
+    xD = d3.scaleBand()
+        .range([ 0, pieWidth ])
+        .padding(0.3);
+    xAxisD = svgD.append("g")
+        .attr("transform", "translate(0," + pieHeight + ")");
+
+    // Y axis
+    yD = d3.scaleLinear()
+        .range([ pieHeight, 0]);
+    yAxisD = svgD.append("g");
+
+    // Tooltip
+    tooltipD = d3.select("#distributionCard")
+        .append("div")
+        .attr('class', 'tooltip')
+        .style("visibility", "hidden");
+
+    // Update the X axis
+    xD.domain(set.map((d) => {return d.name}));
+    xAxisD.call(d3.axisBottom(xD));
+
+    // Update the Y axis
+    yD.domain([0, 100]);
+    yAxisD.call(d3.axisLeft(yD).tickFormat(d => {return d +"%"}));
+
+    let attachData = svgD.selectAll("rect").data(set);
+    attachData
+        .join("rect")
+        .on("mouseover", d => showTooltip(d.name,(d.value + "%")))
+        .on("mousemove", () => mouseMove())
+        .on("mouseout", () => mouseOut())
+        .attr("class", "bar")
+        .attr("x", d => xD(d.name))
+        .attr("y", d => yD(d.value))
+        .attr("width", xD.bandwidth())
+        .attr("height", d => pieHeight - yD(d.value));
+}
+
+function showTooltip(label, value) {
     tooltip.transition()
         .duration(200)
         .style("visibility", "visible");
-    tooltip	.html('<b>' + d.subgroup + '</b><br>' + d.average);
+    tooltip	.html('<b>' + label + '</b><br>' + value);
 }
 
 function mouseOut() {
@@ -100,7 +214,6 @@ function mouseMove() {
 }
 
 function createRadioButtons(list) {
-    console.log(list);
     list.forEach((d, i) => {
         let parent = document.getElementById("options");
         let radio = document.createElement("div"),
@@ -141,6 +254,22 @@ function openTab(e, tabName) {
     e.currentTarget.className += " active";
 }
 
+function toggleDistribution(button) {
+    let buttons = document.getElementsByClassName("buttonToggle");
+    Array.from(buttons).forEach((b) => {
+        b.disabled = false;
+    });
+    button.disabled = true;
+
+    if (button.innerText === "Pie chart") {
+        document.getElementById("barDSvg").style.display = "none";
+        document.getElementById("pieSvg").style.display = "block";
+    } else {
+        document.getElementById("barDSvg").style.display = "block";
+        document.getElementById("pieSvg").style.display = "none";
+    }
+
+}
 
 
 

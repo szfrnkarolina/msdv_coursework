@@ -1,6 +1,4 @@
-//TODO:
-// options: add toggle button personal char vs geography
-// draw geographical chart (barchart), expandable
+//TODO: refactor?
 let groups = {};
 let englishRegions = {};
 let countries = {};

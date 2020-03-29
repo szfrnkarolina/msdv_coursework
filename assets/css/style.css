@@ -186,7 +186,7 @@ svg text {
 }
 
 .bar {
-    fill: var(--accent-color);
+    fill: url(#gradient);
 }
 
 .bar.more {

@@ -1,4 +1,3 @@
-//TODO: refactor?
 let groups = {};
 let englishRegions = {};
 let countries = {};
@@ -6,8 +5,12 @@ let uk = [];
 let ukAverage = {};
 let current = "sex";
 let currentDistribution = {};
-let svg, x, y, xAxis, yAxis, tooltip;
-let svgD, xD, yD, xAxisD, yAxisD, tooltipD;
+let barChartA = {};
+let barChartD = {};
+let tooltip;
+let svgDP, pie, arc, colorScale;
+let pieDrawn = false;
+let barDrawn = false;
 
 // Get the dimensions and set margins
 let margin = 60,
@@ -26,11 +29,15 @@ function initiate() {
             g = d.group;
             groups[g] = [];
         } else {
-            groups[g].push(d);
+            if (d.subgroup === "United Kingdom") {
+                ukAverage = d;
+            } else {
+                groups[g].push(d);
+            }
         }
     }).then(() => {
         createRadioButtons(Object.keys(groups), "characteristics", groups);
-        plot(groups[current]);
+        plotAverageBar(groups[current])
     });
 
     let c = "";
@@ -54,8 +61,6 @@ function initiate() {
                 } else {
                     countries[c].push(d);
                 }
-            } else {
-                ukAverage = d;
             }
         }
     }).then(() => {
@@ -67,30 +72,37 @@ function initiate() {
     document.getElementById("countries").style.display = "none";
     document.getElementById("pieSvg").style.display = "none";
     document.getElementById("toggleButtons").style.display = "none";
-
-
 }
 
-function plot(set) {
+function plotBar(svgID, width, height, marginLeft, marginTop) {
     // Select svg
-    svg = d3.select("#barSvg")
+    let svg = d3.select(svgID)
         .append("g")
         .attr("transform",
-            "translate(" + (margin + 15) + "," + (margin - 20) + ")");
+            "translate(" + marginLeft + "," + marginTop + ")");
 
     // X axis
-    x = d3.scaleBand()
-        .range([0, barWidth])
+    let x = d3.scaleBand()
+        .range([0, width])
         .padding(0.3);
-    xAxis = svg.append("g")
+    let xAxis = svg.append("g")
         .attr("class", "xAxisBar")
-        .attr("transform", "translate(0," + barHeight + ")");
-
+        .attr("transform", "translate(0," + height + ")");
 
     // Y axis
-    y = d3.scaleLinear()
-        .range([barHeight, 0]);
-    yAxis = svg.append("g");
+    let y = d3.scaleLinear()
+        .range([height, 0]);
+    let yAxis = svg.append("g");
+
+    if (svgID.includes("bar")) {
+        barChartA = {x, xAxis, y, yAxis, svg};
+    } else {
+        barChartD = {x, xAxis, y, yAxis, svg};
+    }
+}
+
+function plotAverageBar(set) {
+    plotBar("#barSvg", barWidth, barHeight, (margin + 15), (margin - 20));
 
     // Tooltip
     tooltip = d3.select("#chartCard")
@@ -98,72 +110,73 @@ function plot(set) {
         .attr('class', 'tooltip')
         .style("visibility", "hidden");
 
-    update(set, "sex");
+    updateAverageChart(set, "sex", set === countries);
 }
 
-function update(set, setName) {
+function updateAverageChart(set, setName, isGeo) {
     removeById("avgLine");
     removeById("avgLineLabel");
 
     current = setName;
+    let xDomainCol = (isGeo) ? "area names" : "subgroup";
+    let yDomainCol = "average";
+
+    let x = barChartA.x,
+        y = barChartA.y,
+        xAxis = barChartA.xAxis,
+        yAxis = barChartA.yAxis,
+        svg = barChartA.svg;
 
     // Update the X axis
     x.domain(set.map((d) => {
-        return d.subgroup
+        return d[xDomainCol]
     }));
-    xAxis.call(d3.axisBottom(x));
+    xAxis.call(d3.axisBottom(x))
+        .selectAll("text")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .style("text-anchor", "end")
+            .attr("transform", "rotate(-" + ((isGeo) ? 35 : 20) +")");
 
     // Update the Y axis
     y.domain([0, d3.max(set, d => {
-        return d.average
+        return d[yDomainCol]
     })]);
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+    // Draw UK average line
+    drawAverage(svg, y(ukAverage.average));
 
     // Draw bars
     let attachData = svg.selectAll("rect").data(set);
     attachData
         .join("rect")
-        .on("click", d => expand(d))
+        .on("click", d => {
+            if (isGeo) {
+                expandCountry(d)
+            } else {
+                expand(d)
+            }})
         .on("mouseover", d => {
-            showTooltip(d.subgroup, d.average);
-            showDistribution(d)
+            showTooltip(d[xDomainCol], d[yDomainCol]);
+            showDistribution(d, xDomainCol)
         })
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
         .transition()
-        .duration(3000)
-        .attr("class", d => {return ((d.subgroup === "inactive" || d.subgroup === "part time") ?  "bar more" : "bar")})
-        .attr("x", d => x(d.subgroup))
-        .attr("y", d => y(d.average))
+        .duration(2000)
+        .attr("class", d => {return (isExpandable(d, isGeo)) ? "bar more" : "bar"})
+        .attr("x", d => x(d[xDomainCol]))
+        .attr("y", d => y(d[yDomainCol]))
         .attr("width", x.bandwidth())
-        .attr("height", d => barHeight - y(d.average));
+        .attr("height", d => barHeight - y(d[yDomainCol]));
+
+    // Move average line to top
+    moveToTopById("avgLineLabel");
+    moveToTopById("avgLine");
 }
 
-function updateCountries(set, setName) {
-    current = setName;
-
-    // Update the X axis
-    x.domain(set.map((d) => {
-        return d["area names"]
-    }));
-    xAxis.call(d3.axisBottom(x))
-        .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-35)");
-
-    // Update the Y axis
-    y.domain([0, d3.max(set, d => {
-        return d.average
-    })]);
-    yAxis.transition().duration(1000).call(d3.axisLeft(y));
-
-    // Draw uk average line
-    removeById("avgLine");
-    removeById("avgLineLabel");
-
-    let yCoordinate = y(ukAverage.average);
+function drawAverage(svg, yCoordinate) {
     svg.append('line')
         .attr("id", "avgLine")
         .attr("class", "averageLine")
@@ -178,32 +191,15 @@ function updateCountries(set, setName) {
         .attr("x", (barWidth + margin/2))
         .attr("y", yCoordinate)
         .text(ukAverage.average)
-        .style("text-anchor", "end")
-    ;
+        .style("text-anchor", "end");
+}
 
-    // Draw bars
-    let attachData = svg.selectAll("rect").data(set);
-    attachData
-        .join("rect")
-        .on("click", d => expandCountry(d))
-        .on("mouseover", d => {
-            showTooltip(d["area names"], d.average);
-            showDistribution(d, true)
-        })
-        .on("mousemove", () => mouseMove())
-        .on("mouseout", () => mouseOut())
-        .transition()
-        .duration(2000)
-        .attr("class", d => {return  (isExpandable(d) ? "bar more" : "bar")})
-        .attr("x", d => x(d["area names"]))
-        .attr("y", d => y(d.average))
-        .attr("width", x.bandwidth())
-        .attr("height", d => barHeight - y(d.average));
-
-    // Move average line to top
-    moveToTopById("avgLineLabel");
-    moveToTopById("avgLine");
-
+function isExpandable(d, isGeo) {
+    if (isGeo) {
+        return (d["area codes"].charAt(1) === "9" || d["area codes"].substring(0, 8) === "E1200000");
+    } else {
+        return (d.subgroup === "inactive" || d.subgroup === "part time")
+    }
 }
 
 function expand(d) {
@@ -219,11 +215,7 @@ function expand(d) {
         input = radios[8];
     }
     input.getElementsByTagName("input")[0].checked = true;
-    update(groups[setName], setName)
-}
-
-function isExpandable(d) {
-    return (d["area codes"].charAt(1) === "9" || d["area codes"].substring(0, 8) === "E1200000");
+    updateAverageChart(groups[setName], setName, false)
 }
 
 function expandCountry(d) {
@@ -244,7 +236,7 @@ function expandCountry(d) {
         return;
     }
     document.getElementById("parentCat").innerText = setName;
-    updateCountries(set[setName], setName);
+    updateAverageChart(set[setName], setName, true);
 }
 
 function moveToTopById(id) {
@@ -257,10 +249,8 @@ function removeById(id) {
     if (toRemove) toRemove.remove();
 }
 
-function showDistribution(d, isGeo) {
+function showDistribution(d, domainColumn) {
     if (currentDistribution !== d) {
-        d3.select("#barDSvg").selectAll("*").remove();
-        d3.select("#pieSvg").selectAll("*").remove();
         let distribution = [];
         let keys = Object.keys(d);
         for (let k in keys) {
@@ -272,48 +262,56 @@ function showDistribution(d, isGeo) {
             }
         }
 
-        let title = isGeo ? "Answer distribution: " + d["area names"] : "Answer distribution: " + d.subgroup;
+        let title ="Answer distribution: " + d[domainColumn];
         document.getElementById("toggleButtons").style.display = "block";
         document.getElementById("titleDistribution").innerText = title;
-        plotPieDistribution(distribution);
-        plotBarDistribution(distribution);
+        plotDistributionPie(distribution);
+        plotDistributionBar(distribution);
         currentDistribution = d;
     }
-
 }
 
-function plotPieDistribution(set) {
-    const radius = Math.min(pieWidth, pieHeight) / 2;
+function plotDistributionPie(set) {
+    if(!pieDrawn) {
+        const radius = Math.min(pieWidth, pieHeight) / 2;
 
-    let svg = d3.select("#pieSvg")
-        .append("g")
-        .attr("transform", "translate(" + (pieWidth + 2 * marginD) / 2 + "," + (pieHeight + 2 * marginD) / 2 + ")");
+        svgDP = d3.select("#pieSvg")
+            .append("g")
+            .attr("transform", "translate(" + (pieWidth + 2 * marginD) / 2 + "," + (pieHeight + 2 * marginD) / 2 + ")");
 
-    // Colour scale
-    let color = d3.scaleOrdinal()
-        .domain(set)
-        .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
+        // Colour scale
+        colorScale = d3.scaleOrdinal()
+            .domain(set)
+            .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
 
-    // Calculate pie chart
-    let pie = d3.pie().value(d => {
-        return d.value;
-    });
-    let arc = d3.arc()
-        .innerRadius(0)
-        .outerRadius(radius);
+        // Calculate pie chart
+        pie = d3.pie().value(d => {
+            return d.value;
+        });
+        arc = d3.arc()
+            .innerRadius(0)
+            .outerRadius(radius);
+        pieDrawn = true;
+    }
 
+    updateDistributionPie(set);
+}
+
+function updateDistributionPie(set) {
     // Draw piechart
-    svg
+    svgDP
         .selectAll('slices')
         .data(pie(set))
         .join('path')
+        .transition()
+        .duration(2000)
         .attr('d', arc)
-        .attr('fill', d => {return (color(d.data.name))})
+        .attr('fill', d => {return (colorScale(d.data.name))})
         .attr("stroke", "#fff")
         .style("stroke-width", "1px");
 
     // Labels
-    svg
+    svgDP
         .selectAll('slices')
         .data(pie(set))
         .join('text')
@@ -323,56 +321,47 @@ function plotPieDistribution(set) {
         .style("fill", "#f9f9f9");
 }
 
-function plotBarDistribution(set) {
-    // Select svg
-    svgD = d3.select("#barDSvg")
-        .append("g")
-        .attr("transform",
-            "translate(" + (marginD + 20) + "," + marginD + ")");
+function plotDistributionBar(set) {
+    if(!barDrawn) {
+        plotBar("#barDSvg", pieWidth, pieHeight, (marginD + 20), marginD);
 
-    // X axis
-    xD = d3.scaleBand()
-        .range([0, pieWidth])
-        .padding(0.3);
-    xAxisD = svgD.append("g")
-        .attr("transform", "translate(0," + pieHeight + ")");
+        colorScale = d3.scaleOrdinal()
+            .domain(set)
+            .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
 
-    // Y axis
-    yD = d3.scaleLinear()
-        .range([pieHeight, 0]);
-    yAxisD = svgD.append("g");
+        barDrawn = true;
+    }
 
-    // Colour scale
-    let color = d3.scaleOrdinal()
-        .domain(set)
-        .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
+    updateDistributionBar(set);
+}
 
-    // Tooltip
-    tooltipD = d3.select("#distributionCard")
-        .append("div")
-        .attr('class', 'tooltip')
-        .style("visibility", "hidden");
+function updateDistributionBar(set) {
+    let x = barChartA.x,
+        y = barChartA.y,
+        xAxis = barChartA.xAxis,
+        yAxis = barChartA.yAxis,
+        svg = barChartA.svg;
 
     // Update the X axis
-    xD.domain(set.map((d) => {return d.name}));
-    xAxisD.call(d3.axisBottom(xD));
+    x.domain(set.map((d) => {return d.name}));
+    xAxis.call(d3.axisBottom(x));
 
     // Update the Y axis
-    yD.domain([0, 100]);
-    yAxisD.call(d3.axisLeft(yD).tickFormat(d => {return d + "%"}));
+    y.domain([0, 100]);
+    yAxis.call(d3.axisLeft(y).tickFormat(d => {return d + "%"}));
 
     // Update bard
-    let attachData = svgD.selectAll("rect").data(set);
+    let attachData = svg.selectAll("rect").data(set);
     attachData
         .join("rect")
         .on("mouseover", d => showTooltip(d.name, (d.value + "%")))
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
-        .attr('fill', d => {return (color(d.name))})
-        .attr("x", d => xD(d.name))
-        .attr("y", d => yD(d.value))
-        .attr("width", xD.bandwidth())
-        .attr("height", d => pieHeight - yD(d.value));
+        .attr('fill', d => {return (colorScale(d.name))})
+        .attr("x", d => x(d.name))
+        .attr("y", d => y(d.value))
+        .attr("width", x.bandwidth())
+        .attr("height", d => pieHeight - y(d.value));
 }
 
 function showTooltip(label, value) {
@@ -403,18 +392,7 @@ function createRadioButtons(list, parentId, set) {
             label = document.createElement("label");
 
         label.onclick = e => {
-            let dataSet = [];
-            if (set === countries) {
-                if (d === "United Kingdom") {
-                    dataSet = uk;
-                } else {
-                    dataSet = countries[d];
-                }
-                document.getElementById("parentCat").innerText = e.target.textContent;
-                updateCountries(dataSet, e.target.textContent)
-            } else {
-                update(set[e.target.textContent], e.target.textContent);
-            }
+            changeCategory(e.target, d, set)
         };
 
         input.checked = (d === current);
@@ -432,14 +410,54 @@ function createRadioButtons(list, parentId, set) {
         radio.appendChild(input);
         radio.appendChild(label);
         parent.appendChild(radio);
-
     });
+}
+
+function changeCategory(element, d, set) {
+    let dataSet = [];
+    if (set === countries) {
+        if (d === "United Kingdom") {
+            dataSet = uk;
+        } else {
+            dataSet = countries[d];
+        }
+        document.getElementById("parentCat").innerText = element.textContent;
+    } else {
+        dataSet = set[element.textContent];
+    }
+    updateAverageChart(dataSet, element.textContent, set === countries);
+}
+
+function toggleOptions(button) {
+    let className = (button.className.includes("dist")) ? "distToggle" : "optionToggle";
+    let buttons = document.getElementsByClassName(className);
+
+    Array.from(buttons).forEach((b) => {
+        b.disabled = false;
+    });
+    button.disabled = true;
+
+    if (className === "distToggle") {
+        displayOptions(button,"Pie chart","barDSvg","pieSvg");
+    } else {
+        displayOptions(button,"Personal characteristics","countries", "characteristics");
+    }
+}
+
+function displayOptions(button, innerText, id1, id2) {
+    if (button.innerText === innerText) {
+        document.getElementById(id1).style.display = "none";
+        document.getElementById(id2).style.display = "block";
+    } else {
+        document.getElementById(id1).style.display = "block";
+        document.getElementById(id2).style.display = "none";
+    }
 }
 
 function openTab(e, tabName) {
     let tabs = document.getElementsByClassName("tab");
     Array.prototype.forEach.call(tabs, d => {
-        d.id === tabName ? d.style.display = "flex" : d.style.display = "none"
+        d.id === tabName ? d.style.display = "block" : d.style.display = "none"
     });
 
     let navLinks = document.getElementsByClassName("navLink");
@@ -448,40 +466,6 @@ function openTab(e, tabName) {
     });
 
     e.currentTarget.className += " active";
-}
-
-function toggleDistribution(button) {
-    let buttons = document.getElementsByClassName("distToggle");
-    Array.from(buttons).forEach((b) => {
-        b.disabled = false;
-    });
-    button.disabled = true;
-
-    if (button.innerText === "Pie chart") {
-        document.getElementById("barDSvg").style.display = "none";
-        document.getElementById("pieSvg").style.display = "block";
-    } else {
-        document.getElementById("barDSvg").style.display = "block";
-        document.getElementById("pieSvg").style.display = "none";
-    }
-
-}
-
-function toggleOptions(button) {
-    let buttons = document.getElementsByClassName("optionToggle");
-    Array.from(buttons).forEach((b) => {
-        b.disabled = false;
-    });
-    button.disabled = true;
-
-    if (button.innerText === "Personal characteristics") {
-        document.getElementById("countries").style.display = "none";
-        document.getElementById("characteristics").style.display = "block";
-    } else {
-        document.getElementById("countries").style.display = "block";
-        document.getElementById("characteristics").style.display = "none";
-    }
-
 }
 
 

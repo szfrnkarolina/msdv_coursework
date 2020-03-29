@@ -102,6 +102,9 @@ function plot(set) {
 }
 
 function update(set, setName) {
+    removeById("avgLine");
+    removeById("avgLineLabel");
+
     current = setName;
 
     // Update the X axis
@@ -129,23 +132,11 @@ function update(set, setName) {
         .on("mouseout", () => mouseOut())
         .transition()
         .duration(3000)
-        .attr("class", d => {
-            if (d.subgroup === "inactive" || d.subgroup === "part time") {
-                return "bar more"
-            } else {
-                return "bar"
-            }
-        })
+        .attr("class", d => {return ((d.subgroup === "inactive" || d.subgroup === "part time") ?  "bar more" : "bar")})
         .attr("x", d => x(d.subgroup))
         .attr("y", d => y(d.average))
         .attr("width", x.bandwidth())
-        .attr("height", d => barHeight - y(d.average))
-        .attr("stroke", "#F25757")
-        .attr("stroke-width", d => {
-            if (d.subgroup === "inactive" || d.subgroup === "part time") {
-                return "2px"
-            } else return "0px"
-        });
+        .attr("height", d => barHeight - y(d.average));
 }
 
 function updateCountries(set, setName) {
@@ -168,6 +159,27 @@ function updateCountries(set, setName) {
     })]);
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
 
+    // Draw uk average line
+    removeById("avgLine");
+    removeById("avgLineLabel");
+
+    let yCoordinate = y(ukAverage.average);
+    svg.append('line')
+        .attr("id", "avgLine")
+        .attr("class", "averageLine")
+        .attr("x1", 0)
+        .attr("y1", yCoordinate)
+        .attr("x2", barWidth)
+        .attr("y2", yCoordinate);
+
+    svg.append('text')
+        .attr("id", "avgLineLabel")
+        .attr("class", "averageLineLabel")
+        .attr("x", (barWidth + margin/2))
+        .attr("y", yCoordinate)
+        .text(ukAverage.average)
+        .style("text-anchor", "end")
+    ;
 
     // Draw bars
     let attachData = svg.selectAll("rect").data(set);
@@ -181,26 +193,17 @@ function updateCountries(set, setName) {
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
         .transition()
-        .duration(3000)
-        .attr("class", d => {
-            if (isExpandable(d)) {
-                return "bar more"
-            } else {
-                return "bar"
-            }
-        })
+        .duration(2000)
+        .attr("class", d => {return  (isExpandable(d) ? "bar more" : "bar")})
         .attr("x", d => x(d["area names"]))
         .attr("y", d => y(d.average))
         .attr("width", x.bandwidth())
-        .attr("height", d => barHeight - y(d.average))
-        .attr("stroke", "#F25757")
-        .attr("stroke-width", d => {
-            if (isExpandable(d)) {
-                return "2px"
-            } else {
-                return "0px"
-            }
-        });
+        .attr("height", d => barHeight - y(d.average));
+
+    // Move average line to top
+    moveToTopById("avgLineLabel");
+    moveToTopById("avgLine");
+
 }
 
 function expand(d) {
@@ -242,6 +245,16 @@ function expandCountry(d) {
     }
     document.getElementById("parentCat").innerText = setName;
     updateCountries(set[setName], setName);
+}
+
+function moveToTopById(id) {
+    let toTop = document.getElementById(id);
+    if (toTop) d3.select(toTop).raise();
+}
+
+function removeById(id) {
+    let toRemove= document.getElementById(id);
+    if (toRemove) toRemove.remove();
 }
 
 function showDistribution(d, isGeo) {
@@ -295,9 +308,7 @@ function plotPieDistribution(set) {
         .data(pie(set))
         .join('path')
         .attr('d', arc)
-        .attr('fill', d => {
-            return (color(d.data.name))
-        })
+        .attr('fill', d => {return (color(d.data.name))})
         .attr("stroke", "#fff")
         .style("stroke-width", "1px");
 
@@ -306,12 +317,8 @@ function plotPieDistribution(set) {
         .selectAll('slices')
         .data(pie(set))
         .join('text')
-        .text(d => {
-            return (d.data.name + " " + d.data.value + "%")
-        })
-        .attr("transform", d => {
-            return "translate(" + arc.centroid(d) + ")";
-        })
+        .text(d => {return (d.data.name + " " + d.data.value + "%")})
+        .attr("transform", d => {return "translate(" + arc.centroid(d) + ")";})
         .style("text-anchor", "middle")
         .style("fill", "#f9f9f9");
 }
@@ -347,26 +354,21 @@ function plotBarDistribution(set) {
         .style("visibility", "hidden");
 
     // Update the X axis
-    xD.domain(set.map((d) => {
-        return d.name
-    }));
+    xD.domain(set.map((d) => {return d.name}));
     xAxisD.call(d3.axisBottom(xD));
 
     // Update the Y axis
     yD.domain([0, 100]);
-    yAxisD.call(d3.axisLeft(yD).tickFormat(d => {
-        return d + "%"
-    }));
+    yAxisD.call(d3.axisLeft(yD).tickFormat(d => {return d + "%"}));
 
+    // Update bard
     let attachData = svgD.selectAll("rect").data(set);
     attachData
         .join("rect")
         .on("mouseover", d => showTooltip(d.name, (d.value + "%")))
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
-        .attr('fill', d => {
-            return (color(d.name))
-        })
+        .attr('fill', d => {return (color(d.name))})
         .attr("x", d => xD(d.name))
         .attr("y", d => yD(d.value))
         .attr("width", xD.bandwidth())
@@ -436,12 +438,12 @@ function createRadioButtons(list, parentId, set) {
 
 function openTab(e, tabName) {
     let tabs = document.getElementsByClassName("tab");
-    Array.prototype.forEach.call(tabs, function (d) {
+    Array.prototype.forEach.call(tabs, d => {
         d.id === tabName ? d.style.display = "flex" : d.style.display = "none"
     });
 
     let navLinks = document.getElementsByClassName("navLink");
-    Array.prototype.forEach.call(navLinks, function (d) {
+    Array.prototype.forEach.call(navLinks, d => {
         d.className = d.className.replace(" active", "");
     });
 

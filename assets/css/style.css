@@ -8,7 +8,7 @@
     --hover-color: #a4afb0;
 }
 
-
+/* Main */
 body {
     font-family: 'Lato', sans-serif;
     background-color: var(--bg-color);
@@ -36,9 +36,7 @@ svg text {
     text-transform: capitalize;
 }
 
-#parentCat {
-    color: var(--accent-color);
-}
+/* Layout */
 
 .info {
     font-size: 0.6em;
@@ -87,17 +85,19 @@ svg text {
     display: inline-block;
 }
 
-.tab {
-    margin: 10px;
-    overflow: hidden;
-    animation: rollOutEffect 2s;
-}
-
 .card {
     border: none;
     background-color: var(--card-bg-color);
     border-radius: 5px;
     padding: 15px;
+}
+
+/* Tabs */
+
+.tab {
+    margin: 10px;
+    overflow: hidden;
+    animation: rollDownEffect 2s;
 }
 
 #reportTab {
@@ -108,12 +108,11 @@ svg text {
     display: none;
 }
 
-.bar {
-    fill: var(--accent-color);
-}
+/* Options */
 
-.bar.more:hover {
-    cursor: pointer;
+#options {
+    height: 350px;
+    padding: 10px;
 }
 
 .custom-control {
@@ -141,7 +140,6 @@ svg text {
     height: 1.2em;
 }
 
-
 .custom-control-input:focus~.custom-control-label::before {
     box-shadow: none;
 }
@@ -149,21 +147,6 @@ svg text {
 .custom-control-input:checked~.custom-control-label::before {
     border-color: var(--accent-color);
     background-color: var(--accent-color);
-}
-
-#options {
-    height: 350px;
-    padding: 10px;
-}
-
-.tooltip {
-    padding: 5px;
-    width: 80px;
-    font-size: 1em;
-    text-align: center;
-    text-transform: capitalize;
-    background-color: var(--bg-color);
-    opacity: 0.8;
 }
 
 .buttonToggle {
@@ -186,11 +169,61 @@ svg text {
     color: var(--card-bg-color);
 }
 
+/* SVG */
+
+.tooltip {
+    padding: 5px;
+    width: 80px;
+    font-size: 1em;
+    text-align: center;
+    text-transform: capitalize;
+    background-color: var(--bg-color);
+    opacity: 0.8;
+}
+
+#parentCat {
+    color: var(--accent-color);
+}
+
+.bar {
+    fill: var(--accent-color);
+}
+
+.bar.more {
+    stroke: var(--accent2-color);
+    stroke-width: 2px;
+}
+
+.bar.more:hover {
+    cursor: pointer;
+}
+
+.averageLine {
+    stroke: var(--accent2-color);
+    stroke-width: 1px;
+    stroke-dasharray: 5;
+    animation: appearEffect 1s;
+}
+
+.averageLineLabel {
+    font-size: 0.9em;
+    fill: var(--accent2-color);
+    animation: appearEffect 1s;
+}
+
 .xAxisBar text {
     font-size: 0.75em;
 }
 
-@keyframes rollOutEffect {
+
+/* Animation */
+
+@keyframes rollDownEffect {
     from {max-height: 0}
     to {max-height: 800px;}
+}
+
+@keyframes appearEffect {
+    from {opacity: 0}
+    to {opacity: 1}
 }

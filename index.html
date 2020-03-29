@@ -26,14 +26,24 @@
         <div class="row no-gutters mt-4">
             <div class="col col-md-8 pr-4">
                 <div id="chartCard" class="card">
-                    <h6 class="card-title">Average anxiety level</h6>
+                    <h6 class="card-title d-flex">
+                        <span class="mr-auto">Average anxiety level</span>
+                        <span id="parentCat"></span>
+                    </h6>
                     <svg id="barSvg" class="chart" height="350" width="100%"></svg>
                 </div>
             </div>
             <div class="col col-md">
                 <div class="card">
                     <h6 class="card-title">Options</h6>
-                    <div id="options"></div>
+                    <div id="options">
+                        <h6 id="toggleOptionsButtons" class="text-center mb-4">
+                            <button id="charToggle" class="buttonToggle  optionToggle left" disabled onclick="toggleOptions(this)">Personal characteristics</button><!--
+                        --><button id="geoToggle" class="buttonToggle optionToggle right" onclick="toggleOptions(this)">Countries and regions</button>
+                        </h6>
+                        <div id="characteristics"></div>
+                        <div id="countries"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,8 +57,8 @@
                 <div id="distributionCard" class="card">
                     <h6 class="card-title" id="titleDistribution">Answer distribution</h6>
                     <h6 id="toggleButtons" class="text-center">
-                        <button id="barToggle" class="buttonToggle left" disabled onclick="toggleDistribution(this)">Bar chart</button><!--
-                        --><button id="pieToggle" class="buttonToggle right" onclick="toggleDistribution(this)">Pie chart</button>
+                        <button id="barToggle" class="buttonToggle distToggle left" disabled onclick="toggleDistribution(this)">Bar chart</button><!--
+                        --><button id="pieToggle" class="buttonToggle distToggle right" onclick="toggleDistribution(this)">Pie chart</button>
                     </h6>
                     <svg id="pieSvg" class="chart" height="300" width="100%"></svg>
                     <svg id="barDSvg" class="chart" height="300" width="100%"></svg>

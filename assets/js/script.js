@@ -1,11 +1,18 @@
+//TODO:
+// options: add toggle button personal char vs geography
+// draw geographical chart (barchart), expandable
 let groups = {};
+let englishRegions = {};
+let countries = {};
+let uk = [];
+let ukAverage = {};
 let current = "sex";
 let currentDistribution = {};
 let svg, x, y, xAxis, yAxis, tooltip;
 let svgD, xD, yD, xAxisD, yAxisD, tooltipD;
 
 // Get the dimensions and set margins
-let margin = 30,
+let margin = 60,
     marginD = 30,
     barWidth = document.getElementById("barSvg").clientWidth - 2 * margin,
     barHeight = document.getElementById("barSvg").clientHeight - 2 * margin,
@@ -15,20 +22,54 @@ let margin = 30,
 initiate();
 
 function initiate() {
-    let c = "";
+    let g = "";
     d3.csv("assets/data/anxiety_personal_char.csv", (d) => {
         if (d.group) {
-            c = d.group;
-            groups[c] = [];
+            g = d.group;
+            groups[g] = [];
         } else {
-            groups[c].push(d);
+            groups[g].push(d);
         }
     }).then(() => {
-        createRadioButtons(Object.keys(groups));
+        createRadioButtons(Object.keys(groups), "characteristics", groups);
         plot(groups[current]);
     });
+
+    let c = "";
+    let r = "";
+    d3.csv("assets/data/anxiety_counties.csv", (d) => {
+        let code = d["area codes"];
+        if (code.length !== 0) {
+            if (code.charAt(0) !== "K") {
+                if (code.charAt(1) === "9") {
+                    c = d["area names"];
+                    countries[c] = [];
+                    uk.push(d);
+                } else if (code.charAt(0) === "E") {
+                    if (code.substring(0, 8) === "E1200000") {
+                        countries[c].push(d);
+                        r = d["area names"];
+                        englishRegions[r] = []
+                    } else {
+                        englishRegions[r].push(d);
+                    }
+                } else {
+                    countries[c].push(d);
+                }
+            } else {
+                ukAverage = d;
+            }
+        }
+    }).then(() => {
+        let keys = Object.keys(countries);
+        keys.unshift("United Kingdom");
+        createRadioButtons(keys, "countries", countries);
+    });
+
+    document.getElementById("countries").style.display = "none";
     document.getElementById("pieSvg").style.display = "none";
     document.getElementById("toggleButtons").style.display = "none";
+
 
 }
 
@@ -37,11 +78,11 @@ function plot(set) {
     svg = d3.select("#barSvg")
         .append("g")
         .attr("transform",
-            "translate(" + margin + "," + margin + ")");
+            "translate(" + (margin + 15) + "," + (margin - 20) + ")");
 
     // X axis
     x = d3.scaleBand()
-        .range([ 0, barWidth ])
+        .range([0, barWidth])
         .padding(0.3);
     xAxis = svg.append("g")
         .attr("class", "xAxisBar")
@@ -50,7 +91,7 @@ function plot(set) {
 
     // Y axis
     y = d3.scaleLinear()
-        .range([ barHeight, 0]);
+        .range([barHeight, 0]);
     yAxis = svg.append("g");
 
     // Tooltip
@@ -64,12 +105,17 @@ function plot(set) {
 
 function update(set, setName) {
     current = setName;
+
     // Update the X axis
-    x.domain(set.map((d) => {return d.subgroup}));
+    x.domain(set.map((d) => {
+        return d.subgroup
+    }));
     xAxis.call(d3.axisBottom(x));
 
     // Update the Y axis
-    y.domain([0, d3.max(set, d => { return d.average }) ]);
+    y.domain([0, d3.max(set, d => {
+        return d.average
+    })]);
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
 
     // Draw bars
@@ -77,7 +123,10 @@ function update(set, setName) {
     attachData
         .join("rect")
         .on("click", d => expand(d))
-        .on("mouseover", d => {showTooltip(d.subgroup, d.average); showDistribution(d)})
+        .on("mouseover", d => {
+            showTooltip(d.subgroup, d.average);
+            showDistribution(d)
+        })
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
         .transition()
@@ -99,7 +148,61 @@ function update(set, setName) {
                 return "2px"
             } else return "0px"
         });
+}
 
+function updateCountries(set, setName) {
+    current = setName;
+
+    // Update the X axis
+    x.domain(set.map((d) => {
+        return d["area names"]
+    }));
+    xAxis.call(d3.axisBottom(x))
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-35)");
+
+    // Update the Y axis
+    y.domain([0, d3.max(set, d => {
+        return d.average
+    })]);
+    yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+
+    // Draw bars
+    let attachData = svg.selectAll("rect").data(set);
+    attachData
+        .join("rect")
+        .on("click", d => expandCountry(d))
+        .on("mouseover", d => {
+            showTooltip(d["area names"], d.average);
+            showDistribution(d, true)
+        })
+        .on("mousemove", () => mouseMove())
+        .on("mouseout", () => mouseOut())
+        .transition()
+        .duration(3000)
+        .attr("class", d => {
+            if (isExpandable(d)) {
+                return "bar more"
+            } else {
+                return "bar"
+            }
+        })
+        .attr("x", d => x(d["area names"]))
+        .attr("y", d => y(d.average))
+        .attr("width", x.bandwidth())
+        .attr("height", d => barHeight - y(d.average))
+        .attr("stroke", "#F25757")
+        .attr("stroke-width", d => {
+            if (isExpandable(d)) {
+                return "2px"
+            } else {
+                return "0px"
+            }
+        });
 }
 
 function expand(d) {
@@ -107,7 +210,7 @@ function expand(d) {
     let radios = document.getElementsByClassName("custom-radio");
     let input;
     console.log(radios);
-    if (d.subgroup === "inactive"){
+    if (d.subgroup === "inactive") {
         setName = "reason for economic inactivity";
         input = radios[6];
     } else if (d.subgroup === "part time") {
@@ -118,7 +221,32 @@ function expand(d) {
     update(groups[setName], setName)
 }
 
-function showDistribution(d) {
+function isExpandable(d) {
+    return (d["area codes"].charAt(1) === "9" || d["area codes"].substring(0, 8) === "E1200000");
+}
+
+function expandCountry(d) {
+    let set;
+    let setName = d["area names"];
+    let code = d["area codes"];
+
+    if (code.charAt(1) === "9") {
+        let radios = document.getElementsByClassName("custom-radio");
+        Array.prototype.forEach.call(radios, r => {
+            r.getElementsByTagName("input")[0].checked = r.getElementsByTagName("label")[0].innerHTML === setName;
+        });
+
+        set = countries;
+    } else if (code.substring(0, 8) === "E1200000") {
+        set = englishRegions;
+    } else {
+        return;
+    }
+    document.getElementById("parentCat").innerText = setName;
+    updateCountries(set[setName], setName);
+}
+
+function showDistribution(d, isGeo) {
     if (currentDistribution !== d) {
         d3.select("#barDSvg").selectAll("*").remove();
         d3.select("#pieSvg").selectAll("*").remove();
@@ -132,20 +260,23 @@ function showDistribution(d) {
                 });
             }
         }
+
+        let title = isGeo ? "Answer distribution: " + d["area names"] : "Answer distribution: " + d.subgroup;
         document.getElementById("toggleButtons").style.display = "block";
-        document.getElementById("titleDistribution").innerText = "Answer distribution: " + d.subgroup;
+        document.getElementById("titleDistribution").innerText = title;
         plotPieDistribution(distribution);
         plotBarDistribution(distribution);
         currentDistribution = d;
     }
 
 }
+
 function plotPieDistribution(set) {
-    const radius = Math.min(pieWidth, pieHeight) / 2 ;
+    const radius = Math.min(pieWidth, pieHeight) / 2;
 
     let svg = d3.select("#pieSvg")
         .append("g")
-        .attr("transform", "translate(" + (pieWidth + 2*marginD) / 2 + "," + (pieHeight + 2*marginD) / 2 + ")");
+        .attr("transform", "translate(" + (pieWidth + 2 * marginD) / 2 + "," + (pieHeight + 2 * marginD) / 2 + ")");
 
     // Colour scale
     let color = d3.scaleOrdinal()
@@ -153,7 +284,9 @@ function plotPieDistribution(set) {
         .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
 
     // Calculate pie chart
-    let pie = d3.pie().value(d => {return d.value; });
+    let pie = d3.pie().value(d => {
+        return d.value;
+    });
     let arc = d3.arc()
         .innerRadius(0)
         .outerRadius(radius);
@@ -164,7 +297,9 @@ function plotPieDistribution(set) {
         .data(pie(set))
         .join('path')
         .attr('d', arc)
-        .attr('fill', d => { return(color(d.data.name)) })
+        .attr('fill', d => {
+            return (color(d.data.name))
+        })
         .attr("stroke", "#fff")
         .style("stroke-width", "1px");
 
@@ -173,8 +308,12 @@ function plotPieDistribution(set) {
         .selectAll('slices')
         .data(pie(set))
         .join('text')
-        .text(d => {return (d.data.name + " " + d.data.value + "%")})
-        .attr("transform", d => { return "translate(" + arc.centroid(d) + ")";  })
+        .text(d => {
+            return (d.data.name + " " + d.data.value + "%")
+        })
+        .attr("transform", d => {
+            return "translate(" + arc.centroid(d) + ")";
+        })
         .style("text-anchor", "middle")
         .style("fill", "#f9f9f9");
 }
@@ -188,14 +327,14 @@ function plotBarDistribution(set) {
 
     // X axis
     xD = d3.scaleBand()
-        .range([ 0, pieWidth ])
+        .range([0, pieWidth])
         .padding(0.3);
     xAxisD = svgD.append("g")
         .attr("transform", "translate(0," + pieHeight + ")");
 
     // Y axis
     yD = d3.scaleLinear()
-        .range([ pieHeight, 0]);
+        .range([pieHeight, 0]);
     yAxisD = svgD.append("g");
 
     // Colour scale
@@ -210,20 +349,26 @@ function plotBarDistribution(set) {
         .style("visibility", "hidden");
 
     // Update the X axis
-    xD.domain(set.map((d) => {return d.name}));
+    xD.domain(set.map((d) => {
+        return d.name
+    }));
     xAxisD.call(d3.axisBottom(xD));
 
     // Update the Y axis
     yD.domain([0, 100]);
-    yAxisD.call(d3.axisLeft(yD).tickFormat(d => {return d +"%"}));
+    yAxisD.call(d3.axisLeft(yD).tickFormat(d => {
+        return d + "%"
+    }));
 
     let attachData = svgD.selectAll("rect").data(set);
     attachData
         .join("rect")
-        .on("mouseover", d => showTooltip(d.name,(d.value + "%")))
+        .on("mouseover", d => showTooltip(d.name, (d.value + "%")))
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
-        .attr('fill', d => { return(color(d.name)) })
+        .attr('fill', d => {
+            return (color(d.name))
+        })
         .attr("x", d => xD(d.name))
         .attr("y", d => yD(d.value))
         .attr("width", xD.bandwidth())
@@ -234,7 +379,7 @@ function showTooltip(label, value) {
     tooltip.transition()
         .duration(200)
         .style("visibility", "visible");
-    tooltip	.html('<b>' + label + '</b><br>' + value);
+    tooltip.html('<b>' + label + '</b><br>' + value);
 }
 
 function mouseOut() {
@@ -249,26 +394,40 @@ function mouseMove() {
         .style("top", (event.pageY - 100) + "px");
 }
 
-function createRadioButtons(list) {
+function createRadioButtons(list, parentId, set) {
     list.forEach((d, i) => {
-        let parent = document.getElementById("options");
+        let radioId = set === countries ? "c" + i : i;
+        let parent = document.getElementById(parentId);
         let radio = document.createElement("div"),
             input = document.createElement("input"),
             label = document.createElement("label");
 
         label.onclick = e => {
-            update(groups[e.target.textContent], e.target.textContent);
+            let dataSet = [];
+            if (set === countries) {
+                if (d === "United Kingdom") {
+                    dataSet = uk;
+                } else {
+                    dataSet = countries[d];
+                }
+                document.getElementById("parentCat").innerText = e.target.textContent;
+                updateCountries(dataSet, e.target.textContent)
+            } else {
+                update(set[e.target.textContent], e.target.textContent);
+            }
         };
 
         input.checked = (d === current);
         radio.className = "custom-control custom-radio";
-        if (d.includes("reason")) {radio.className += " ml-4"}
+        if (d.includes("reason") || set === countries && d !== "United Kingdom") {
+            radio.className += " ml-4"
+        }
         input.className = "custom-control-input";
         input.type = "radio";
-        input.id = "radio" + i;
+        input.id = "radio" + radioId;
         input.setAttribute("name", "customRadio");
         label.className = "custom-control-label";
-        label.setAttribute("for", "radio" + i);
+        label.setAttribute("for", "radio" + radioId);
         label.innerHTML = d;
         radio.appendChild(input);
         radio.appendChild(label);
@@ -292,7 +451,7 @@ function openTab(e, tabName) {
 }
 
 function toggleDistribution(button) {
-    let buttons = document.getElementsByClassName("buttonToggle");
+    let buttons = document.getElementsByClassName("distToggle");
     Array.from(buttons).forEach((b) => {
         b.disabled = false;
     });
@@ -304,6 +463,23 @@ function toggleDistribution(button) {
     } else {
         document.getElementById("barDSvg").style.display = "block";
         document.getElementById("pieSvg").style.display = "none";
+    }
+
+}
+
+function toggleOptions(button) {
+    let buttons = document.getElementsByClassName("optionToggle");
+    Array.from(buttons).forEach((b) => {
+        b.disabled = false;
+    });
+    button.disabled = true;
+
+    if (button.innerText === "Personal characteristics") {
+        document.getElementById("countries").style.display = "none";
+        document.getElementById("characteristics").style.display = "block";
+    } else {
+        document.getElementById("countries").style.display = "block";
+        document.getElementById("characteristics").style.display = "none";
     }
 
 }

@@ -47,7 +47,7 @@
                     <h6 class="card-title">Categories</h6>
                     <div class="loader mx-auto"><div></div><div></div><div></div></div>
                     <div id="options">
-                        <h6 id="toggleOptionsButtons" class="text-center mb-4">
+                        <h6 id="toggleOptionsButtons" class="text-center mb-4" style="visibility: hidden">
                             <button class="buttonToggle  optionToggle left" disabled onclick="toggleOptions(this)">Personal characteristics</button><!--
                         --><button class="buttonToggle optionToggle right" onclick="toggleOptions(this)">Countries and regions</button>
                         </h6>
@@ -62,7 +62,7 @@
                 <div class="card">
                     <h6 class="card-title">Chart key</h6>
                     <div class="card-body">
-                        <p class="chart-key">
+                        <p class="mt-3">
                             <svg height="30" width="600">
                                 <rect class="bar more" x="2" y="2" width="20" height="26"></rect>
                                 <text x="30" y="17">Expandable category, click to explore more</text>
@@ -70,7 +70,7 @@
                                 <text x="345" y="17">UK average</text>
                             </svg>
                         </p>
-                    <p class="mt-4">
+                    <p class="mt-5">
                         The chart above shows average anxiety level in each category. Switch through categories via menu on the right.
                        <br><br>
                         Hover over bars to display details and calculate answer distribution.
@@ -81,12 +81,12 @@
             <div class="col col-md">
                 <div id="distributionCard" class="card">
                     <h6 class="card-title" id="titleDistribution">Answer distribution</h6>
-                    <h6 id="toggleButtons" class="text-center">
+                    <h6 id="toggleButtons" class="text-center" style="visibility: hidden">
                         <button class="buttonToggle distToggle left" disabled onclick="toggleOptions(this)">Bar chart</button><!--
                         --><button class="buttonToggle distToggle right" onclick="toggleOptions(this)">Pie chart</button>
                     </h6>
-                    <svg id="pieSvg" class="chart" height="280" width="100%"></svg>
                     <svg id="barDSvg" class="chart" height="280" width="100%"></svg>
+                    <svg id="pieSvg" class="chart" height="280" width="100%"></svg>
                 </div>
             </div>
         </div>

@@ -30,9 +30,7 @@ initiate();
 function initiate() {
     document.getElementById("characteristics").style.display = "none";
     document.getElementById("countries").style.display = "none";
-    document.getElementById("barSvg").style.display = "none";
     document.getElementById("pieSvg").style.display = "none";
-    document.getElementById("toggleButtons").style.visibility = "hidden";
 
     loadCharacteristicsData("assets/data/anxiety_personal_char.csv");
 }
@@ -86,8 +84,8 @@ function loadGeoData(fileSrc) {
         keys.unshift("United Kingdom");
         createRadioButtons(keys, "countries", countries);
 
+        document.getElementById("toggleOptionsButtons").style.visibility = "visible";
         document.getElementById("characteristics").style.display = "block";
-        document.getElementById("barSvg").style.display = "block";
 
         // Hide loaders
         Array.prototype.forEach.call(document.getElementsByClassName("loader"), l => {

@@ -3,12 +3,15 @@ let englishRegions = {};
 let countries = {};
 let uk = [];
 let ukAverage = {};
-let current = "sex";
-let currentDistribution = {};
+
 let barChartA = {};
 let barChartD = {};
 let tooltip;
 let svgDP, pie, arc, colorScale;
+
+let current = "sex";
+let currentDistribution = {};
+
 let pieDrawn = false;
 let barDrawn = false;
 
@@ -23,8 +26,18 @@ let margin = 60,
 initiate();
 
 function initiate() {
+    document.getElementById("characteristics").style.display = "none";
+    document.getElementById("countries").style.display = "none";
+    document.getElementById("barSvg").style.display = "none";
+    document.getElementById("pieSvg").style.display = "none";
+    document.getElementById("toggleButtons").style.display = "none";
+
+    loadCharacteristicsData("assets/data/anxiety_personal_char.csv");
+}
+
+function loadCharacteristicsData(fileSrc) {
     let g = "";
-    d3.csv("assets/data/anxiety_personal_char.csv", (d) => {
+    d3.csv(fileSrc, (d) => {
         if (d.group) {
             g = d.group;
             groups[g] = [];
@@ -37,12 +50,15 @@ function initiate() {
         }
     }).then(() => {
         createRadioButtons(Object.keys(groups), "characteristics", groups);
-        plotAverageBar(groups[current])
+        plotAverageBar(groups[current]);
+        loadGeoData("assets/data/anxiety_counties.csv");
     });
+}
 
+function loadGeoData(fileSrc) {
     let c = "";
     let r = "";
-    d3.csv("assets/data/anxiety_counties.csv", (d) => {
+    d3.csv(fileSrc, (d) => {
         let code = d["area codes"];
         if (code.length !== 0) {
             if (code.charAt(0) !== "K") {
@@ -68,10 +84,6 @@ function initiate() {
         keys.unshift("United Kingdom");
         createRadioButtons(keys, "countries", countries);
     });
-
-    document.getElementById("countries").style.display = "none";
-    document.getElementById("pieSvg").style.display = "none";
-    document.getElementById("toggleButtons").style.display = "none";
 }
 
 function plotBar(svgID, width, height, marginLeft, marginTop) {
@@ -94,10 +106,10 @@ function plotBar(svgID, width, height, marginLeft, marginTop) {
         .range([height, 0]);
     let yAxis = svg.append("g");
 
-    if (svgID.includes("bar")) {
-        barChartA = {x, xAxis, y, yAxis, svg};
-    } else {
+    if (svgID.includes("barD")) {
         barChartD = {x, xAxis, y, yAxis, svg};
+    } else {
+        barChartA = {x, xAxis, y, yAxis, svg};
     }
 }
 
@@ -177,7 +189,7 @@ function updateAverageChart(set, setName, isGeo) {
 }
 
 function drawAverage(svg, yCoordinate) {
-    svg.append('line')
+    svg.append("line")
         .attr("id", "avgLine")
         .attr("class", "averageLine")
         .attr("x1", 0)
@@ -185,7 +197,7 @@ function drawAverage(svg, yCoordinate) {
         .attr("x2", barWidth)
         .attr("y2", yCoordinate);
 
-    svg.append('text')
+    svg.append("text")
         .attr("id", "avgLineLabel")
         .attr("class", "averageLineLabel")
         .attr("x", (barWidth + margin/2))
@@ -206,7 +218,6 @@ function expand(d) {
     let setName = "";
     let radios = document.getElementsByClassName("custom-radio");
     let input;
-    console.log(radios);
     if (d.subgroup === "inactive") {
         setName = "reason for economic inactivity";
         input = radios[6];
@@ -287,7 +298,7 @@ function plotDistributionPie(set) {
         // Calculate pie chart
         pie = d3.pie().value(d => {
             return d.value;
-        });
+        }).sort(null);
         arc = d3.arc()
             .innerRadius(0)
             .outerRadius(radius);
@@ -297,28 +308,40 @@ function plotDistributionPie(set) {
     updateDistributionPie(set);
 }
 
+
 function updateDistributionPie(set) {
-    // Draw piechart
-    svgDP
-        .selectAll('slices')
-        .data(pie(set))
-        .join('path')
-        .transition()
-        .duration(2000)
-        .attr('d', arc)
-        .attr('fill', d => {return (colorScale(d.data.name))})
+    let chart = svgDP
+        .selectAll("path")
+        .data(pie(set));
+
+    // Animate
+    chart.transition().duration(1000).attrTween("d", function(d) {
+        let interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return (t) => arc(interpolate(t));
+    });
+
+    // Draw pie chart
+    chart.enter().append("path")
+        .attr("d", arc)
+        .attr("fill", d => {return (colorScale(d.data.name))})
         .attr("stroke", "#fff")
-        .style("stroke-width", "1px");
+        .style("stroke-width", "1px")
+        .each(function(d) { this._current = d; });
+
 
     // Labels
     svgDP
-        .selectAll('slices')
+        .selectAll("text")
         .data(pie(set))
-        .join('text')
+        .join("text")
         .text(d => {return (d.data.name + " " + d.data.value + "%")})
+        .attr("class", "pieLabels")
+        .transition().duration(1000)
         .attr("transform", d => {return "translate(" + arc.centroid(d) + ")";})
         .style("text-anchor", "middle")
         .style("fill", "#f9f9f9");
+
 }
 
 function plotDistributionBar(set) {
@@ -336,11 +359,11 @@ function plotDistributionBar(set) {
 }
 
 function updateDistributionBar(set) {
-    let x = barChartA.x,
-        y = barChartA.y,
-        xAxis = barChartA.xAxis,
-        yAxis = barChartA.yAxis,
-        svg = barChartA.svg;
+    let x = barChartD.x,
+        y = barChartD.y,
+        xAxis = barChartD.xAxis,
+        yAxis = barChartD.yAxis,
+        svg = barChartD.svg;
 
     // Update the X axis
     x.domain(set.map((d) => {return d.name}));

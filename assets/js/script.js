@@ -45,6 +45,9 @@ function loadCharacteristicsData(fileSrc) {
             if (d.subgroup === "United Kingdom") {
                 ukAverage = d;
             } else {
+                if (d.subgroup === "women") {
+                    showDistribution(d, "subgroup");
+                }
                 groups[g].push(d);
             }
         }

@@ -26,9 +26,9 @@ let margin = 60,
 initiate();
 
 function initiate() {
-    document.getElementById("characteristics").style.display = "none";
+    // document.getElementById("characteristics").style.display = "none";
     document.getElementById("countries").style.display = "none";
-    document.getElementById("barSvg").style.display = "none";
+    // document.getElementById("barSvg").style.display = "none";
     document.getElementById("pieSvg").style.display = "none";
     document.getElementById("toggleButtons").style.display = "none";
 

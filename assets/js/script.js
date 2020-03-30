@@ -16,12 +16,14 @@ let pieDrawn = false;
 let barDrawn = false;
 
 // Get the dimensions and set margins
-let margin = 60,
-    marginD = 30,
-    barWidth = document.getElementById("barSvg").clientWidth - 2 * margin,
-    barHeight = document.getElementById("barSvg").clientHeight - 2 * margin,
-    pieWidth = document.getElementById("pieSvg").clientWidth - 2 * marginD,
-    pieHeight = document.getElementById("pieSvg").clientHeight - 2 * marginD;
+let marginAx = 75,
+    marginAy = 40,
+    marginDx = 30,
+    marginDy = 15,
+    avgChartWidth = document.getElementById("barSvg").clientWidth - 2 * marginAx,
+    avgChartHeight = document.getElementById("barSvg").clientHeight - 2 * marginAy,
+    distChartWidth = document.getElementById("pieSvg").clientWidth - 2 * marginDx,
+    distChartHeight = document.getElementById("pieSvg").clientHeight - 2 * marginDy;
 
 initiate();
 
@@ -30,7 +32,7 @@ function initiate() {
     document.getElementById("countries").style.display = "none";
     document.getElementById("barSvg").style.display = "none";
     document.getElementById("pieSvg").style.display = "none";
-    document.getElementById("toggleButtons").style.display = "none";
+    document.getElementById("toggleButtons").style.visibility = "hidden";
 
     loadCharacteristicsData("assets/data/anxiety_personal_char.csv");
 }
@@ -122,7 +124,7 @@ function plotBar(svgID, width, height, marginLeft, marginTop) {
 }
 
 function plotAverageBar(set) {
-    plotBar("#barSvg", barWidth, barHeight, (margin + 15), (margin - 20));
+    plotBar("#barSvg", avgChartWidth, avgChartHeight, (marginAx), (marginAy));
 
     // Tooltip
     tooltip = d3.select("#chartCard")
@@ -189,7 +191,7 @@ function updateAverageChart(set, setName, isGeo) {
         .attr("x", d => x(d[xDomainCol]))
         .attr("y", d => y(d[yDomainCol]))
         .attr("width", x.bandwidth())
-        .attr("height", d => barHeight - y(d[yDomainCol]));
+        .attr("height", d => avgChartHeight - y(d[yDomainCol]));
 
     // Move average line to top
     moveToTopById("avgLineLabel");
@@ -202,13 +204,13 @@ function drawAverage(svg, yCoordinate) {
         .attr("class", "averageLine")
         .attr("x1", 0)
         .attr("y1", yCoordinate)
-        .attr("x2", barWidth)
+        .attr("x2", avgChartWidth)
         .attr("y2", yCoordinate);
 
     svg.append("text")
         .attr("id", "avgLineLabel")
         .attr("class", "averageLineLabel")
-        .attr("x", (barWidth + margin/2))
+        .attr("x", (avgChartWidth + marginAx/2))
         .attr("y", yCoordinate)
         .text(ukAverage.average)
         .style("text-anchor", "end");
@@ -282,8 +284,9 @@ function showDistribution(d, domainColumn) {
         }
 
         let title ="Answer distribution: " + d[domainColumn];
-        document.getElementById("toggleButtons").style.display = "block";
+        document.getElementById("toggleButtons").style.visibility = "visible";
         document.getElementById("titleDistribution").innerText = title;
+        console.log(distribution);
         plotDistributionPie(distribution);
         plotDistributionBar(distribution);
         currentDistribution = d;
@@ -292,11 +295,11 @@ function showDistribution(d, domainColumn) {
 
 function plotDistributionPie(set) {
     if(!pieDrawn) {
-        const radius = Math.min(pieWidth, pieHeight) / 2;
+        const radius = Math.min(distChartWidth, distChartHeight) / 2;
 
         svgDP = d3.select("#pieSvg")
             .append("g")
-            .attr("transform", "translate(" + (pieWidth + 2 * marginD) / 2 + "," + (pieHeight + 2 * marginD) / 2 + ")");
+            .attr("transform", "translate(" + (distChartWidth + 2* marginDx) / 2 + "," + (distChartHeight + 2 * marginDy) / 2 + ")");
 
         // Colour scale
         colorScale = d3.scaleOrdinal()
@@ -354,7 +357,7 @@ function updateDistributionPie(set) {
 
 function plotDistributionBar(set) {
     if(!barDrawn) {
-        plotBar("#barDSvg", pieWidth, pieHeight, (marginD + 20), marginD);
+        plotBar("#barDSvg", distChartWidth, distChartHeight, (marginDx + 20), (marginDy));
 
         colorScale = d3.scaleOrdinal()
             .domain(set)
@@ -393,7 +396,7 @@ function updateDistributionBar(set) {
         .attr("x", d => x(d.name))
         .attr("y", d => y(d.value))
         .attr("width", x.bandwidth())
-        .attr("height", d => pieHeight - y(d.value));
+        .attr("height", d => distChartHeight - y(d.value));
 }
 
 function showTooltip(label, value) {

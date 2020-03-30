@@ -92,6 +92,10 @@ svg text {
     padding: 15px;
 }
 
+.card-body {
+    height: 310px;
+}
+
 /* Tabs */
 
 .tab {
@@ -215,6 +219,11 @@ svg text {
     font-size: 0.75em;
 }
 
+/* Text */
+
+.chart-key svg text{
+    text-transform: none;
+}
 
 /* Animation */
 
@@ -229,6 +238,7 @@ svg text {
 }
 
 /* Loading bar */
+
 .loader {
     display: inline-block;
     position: relative;

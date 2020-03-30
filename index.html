@@ -44,7 +44,7 @@
             </div>
             <div class="col col-md">
                 <div class="card">
-                    <h6 class="card-title">Options</h6>
+                    <h6 class="card-title">Categories</h6>
                     <div class="loader mx-auto"><div></div><div></div><div></div></div>
                     <div id="options">
                         <h6 id="toggleOptionsButtons" class="text-center mb-4">
@@ -60,7 +60,22 @@
         <div class="row no-gutters mt-3">
             <div class="col col-md-8 pr-4">
                 <div class="card">
-                    <h6 class="card-title">Legend</h6>
+                    <h6 class="card-title">Chart key</h6>
+                    <div class="card-body">
+                        <p class="chart-key">
+                            <svg height="30" width="600">
+                                <rect class="bar more" x="2" y="2" width="20" height="26"></rect>
+                                <text x="30" y="17">Expandable category, click to explore more</text>
+                                <line class="averageLine" x1="300" y1="14" x2="340" y2="14"></line>
+                                <text x="345" y="17">UK average</text>
+                            </svg>
+                        </p>
+                    <p class="mt-4">
+                        The chart above shows average anxiety level in each category. Switch through categories via menu on the right.
+                       <br><br>
+                        Hover over bars to display details and calculate answer distribution.
+                    </p>
+                    </div>
                 </div>
             </div>
             <div class="col col-md">
@@ -70,8 +85,8 @@
                         <button class="buttonToggle distToggle left" disabled onclick="toggleOptions(this)">Bar chart</button><!--
                         --><button class="buttonToggle distToggle right" onclick="toggleOptions(this)">Pie chart</button>
                     </h6>
-                    <svg id="pieSvg" class="chart" height="300" width="100%"></svg>
-                    <svg id="barDSvg" class="chart" height="300" width="100%"></svg>
+                    <svg id="pieSvg" class="chart" height="280" width="100%"></svg>
+                    <svg id="barDSvg" class="chart" height="280" width="100%"></svg>
                 </div>
             </div>
         </div>

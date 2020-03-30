@@ -323,7 +323,7 @@ function updateDistributionPie(set) {
         .data(pie(set));
 
     // Animate
-    chart.transition().duration(1000).attrTween("d", function(d) {
+    chart.transition().duration(800).attrTween("d", function(d) {
         let interpolate = d3.interpolate(this._current, d);
         this._current = interpolate(0);
         return (t) => arc(interpolate(t));
@@ -345,7 +345,7 @@ function updateDistributionPie(set) {
         .join("text")
         .text(d => {return (d.data.name + " " + d.data.value + "%")})
         .attr("class", "pieLabels")
-        .transition().duration(1000)
+        .transition().duration(800)
         .attr("transform", d => {return "translate(" + arc.centroid(d) + ")";})
         .style("text-anchor", "middle")
         .style("fill", "#f9f9f9");
@@ -388,6 +388,7 @@ function updateDistributionBar(set) {
         .on("mouseover", d => showTooltip(d.name, (d.value + "%")))
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
+        .transition().duration(200)
         .attr('fill', d => {return (colorScale(d.name))})
         .attr("x", d => x(d.name))
         .attr("y", d => y(d.value))

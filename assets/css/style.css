@@ -44,7 +44,7 @@ svg text {
 }
 
 .topbar {
-    margin: 10px;
+    margin: 0 10px 0 10px;
     padding: 15px;
     border-radius: 5px;
     background-color: var(--card-bg-color);
@@ -99,7 +99,7 @@ svg text {
 /* Tabs */
 
 .tab {
-    margin: 10px;
+    margin: 0 10px 20px 10px;
     overflow: hidden;
     animation: rollDownEffect 2s;
 }

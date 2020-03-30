@@ -17,7 +17,7 @@ let barDrawn = false;
 
 // Get the dimensions and set margins
 let marginAx = 75,
-    marginAy = 40,
+    marginAy = 60,
     marginDx = 30,
     marginDy = 15,
     avgChartWidth = document.getElementById("barSvg").clientWidth - 2 * marginAx,
@@ -124,7 +124,7 @@ function plotBar(svgID, width, height, marginLeft, marginTop) {
 }
 
 function plotAverageBar(set) {
-    plotBar("#barSvg", avgChartWidth, avgChartHeight, (marginAx), (marginAy));
+    plotBar("#barSvg", avgChartWidth, avgChartHeight, (marginAx), (marginAy - 20));
 
     // Tooltip
     tooltip = d3.select("#chartCard")
@@ -286,7 +286,6 @@ function showDistribution(d, domainColumn) {
         let title ="Answer distribution: " + d[domainColumn];
         document.getElementById("toggleButtons").style.visibility = "visible";
         document.getElementById("titleDistribution").innerText = title;
-        console.log(distribution);
         plotDistributionPie(distribution);
         plotDistributionBar(distribution);
         currentDistribution = d;
@@ -427,7 +426,7 @@ function createRadioButtons(list, parentId, set) {
             label = document.createElement("label");
 
         label.onclick = e => {
-            changeCategory(e.target, d, set)
+            changeCategory(e.target.textContent, set)
         };
 
         input.checked = (d === current);
@@ -448,19 +447,38 @@ function createRadioButtons(list, parentId, set) {
     });
 }
 
-function changeCategory(element, d, set) {
+function displayParent(parent) {
+    let categoryName;
+    if (parent.innerText === "United Kingdom" || Object.keys(countries).includes(parent.innerText)) {
+        categoryName = "United Kingdom";
+    } else {
+        categoryName = "England";
+    }
+    changeCategory(categoryName);
+
+    // Check radio button
+    let radios = document.getElementsByClassName("custom-radio");
+    Array.prototype.forEach.call(radios, r => {
+        r.getElementsByTagName("input")[0].checked = r.getElementsByTagName("label")[0].innerHTML === categoryName;
+    });
+}
+
+function changeCategory(category, setIn) {
+    let set = setIn ? setIn : countries;
     let dataSet = [];
     if (set === countries) {
-        if (d === "United Kingdom") {
+        if (category === "United Kingdom") {
             dataSet = uk;
         } else {
-            dataSet = countries[d];
+            dataSet = countries[category];
         }
-        document.getElementById("parentCat").innerText = element.textContent;
+        document.getElementById("parentCat").style.display = "inline-block";
+        document.getElementById("parentCat").innerText = category;
     } else {
-        dataSet = set[element.textContent];
+        document.getElementById("parentCat").style.display = "none";
+        dataSet = set[category];
     }
-    updateAverageChart(dataSet, element.textContent, set === countries);
+    updateAverageChart(dataSet, category, set === countries);
 }
 
 function toggleOptions(button) {

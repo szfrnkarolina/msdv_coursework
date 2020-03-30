@@ -189,6 +189,10 @@ svg text {
     color: var(--accent-color);
 }
 
+#parentCat:hover {
+    cursor: pointer;
+}
+
 .bar {
     fill: url(#gradient);
 }

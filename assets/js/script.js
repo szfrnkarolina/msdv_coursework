@@ -26,9 +26,9 @@ let margin = 60,
 initiate();
 
 function initiate() {
-    // document.getElementById("characteristics").style.display = "none";
+    document.getElementById("characteristics").style.display = "none";
     document.getElementById("countries").style.display = "none";
-    // document.getElementById("barSvg").style.display = "none";
+    document.getElementById("barSvg").style.display = "none";
     document.getElementById("pieSvg").style.display = "none";
     document.getElementById("toggleButtons").style.display = "none";
 
@@ -83,6 +83,14 @@ function loadGeoData(fileSrc) {
         let keys = Object.keys(countries);
         keys.unshift("United Kingdom");
         createRadioButtons(keys, "countries", countries);
+
+        document.getElementById("characteristics").style.display = "block";
+        document.getElementById("barSvg").style.display = "block";
+
+        // Hide loaders
+        Array.prototype.forEach.call(document.getElementsByClassName("loader"), l => {
+            l.style.display = "none";
+        });
     });
 }
 

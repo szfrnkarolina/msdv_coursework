@@ -36,6 +36,11 @@ svg text {
     text-transform: capitalize;
 }
 
+h5 {
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
 /* Layout */
 
 .info {
@@ -92,7 +97,8 @@ svg text {
     padding: 15px;
 }
 
-.card-body {
+.card-body.key {
+    line-height: 150%;
     height: 310px;
 }
 

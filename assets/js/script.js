@@ -44,10 +44,8 @@ function loadCharacteristicsData(fileSrc) {
         } else {
             if (d.subgroup === "United Kingdom") {
                 ukAverage = d;
+                showDistribution(d, "subgroup");
             } else {
-                if (d.subgroup === "women") {
-                    showDistribution(d, "subgroup");
-                }
                 groups[g].push(d);
             }
         }
@@ -182,7 +180,7 @@ function updateAverageChart(set, setName, isGeo) {
             }})
         .on("mouseover", d => {
             showTooltip(d[xDomainCol], d[yDomainCol]);
-            showDistribution(d, xDomainCol)
+            showDistribution(d, xDomainCol);
         })
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
@@ -201,6 +199,9 @@ function updateAverageChart(set, setName, isGeo) {
 
 function drawAverage(svg, yCoordinate) {
     svg.append("line")
+        .on("mouseover", () => {
+            showDistribution(ukAverage, "subgroup");
+        })
         .attr("id", "avgLine")
         .attr("class", "averageLine")
         .attr("x1", 0)
@@ -209,6 +210,9 @@ function drawAverage(svg, yCoordinate) {
         .attr("y2", yCoordinate);
 
     svg.append("text")
+        .on("mouseover", () => {
+            showDistribution(ukAverage, "subgroup");
+        })
         .attr("id", "avgLineLabel")
         .attr("class", "averageLineLabel")
         .attr("x", (avgChartWidth + marginAx/2))
@@ -304,7 +308,7 @@ function plotDistributionPie(set) {
         // Colour scale
         colorScale = d3.scaleOrdinal()
             .domain(set)
-            .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
+            .range(["#08415C", "#377896", "#055F89", "#68CFFF"]);
 
         // Calculate pie chart
         pie = d3.pie().value(d => {
@@ -361,7 +365,7 @@ function plotDistributionBar(set) {
 
         colorScale = d3.scaleOrdinal()
             .domain(set)
-            .range(["#78CDD7", "#328189", "#2F5559", "#0C9FAF"]);
+            .range(["#08415C", "#377896", "#055F89", "#68CFFF"]);
 
         barDrawn = true;
     }

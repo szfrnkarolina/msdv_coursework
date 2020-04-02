@@ -30,13 +30,16 @@
                         <span class="mr-auto">Average anxiety level</span>
                         <span id="parentCat" onclick="displayParent(this)" style="display: none"></span>
                     </h6>
-                    <div class="loader mx-auto"><div></div><div></div><div></div></div>
+                    <div class="loader mx-auto">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                     <svg id="barSvg" class="chart" height="350" width="100%" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <linearGradient id="gradient" x1="68%" y1="100%" x2="32%" y2="0%" >
-                                <stop offset="0%" style="stop-color:rgb(120,205,215);stop-opacity:1"></stop>
-                                <stop offset="25%" style="stop-color:rgb(120,205,215);stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:rgb(0,237,213);stop-opacity:1"></stop>
+                            <linearGradient id="gradient" x1="50%" y1="100%" x2="50%" y2="0%">
+                                <stop offset="0%" style="stop-color:rgb(40,152,204);stop-opacity:1"></stop>
+                                <stop offset="100%" style="stop-color:rgb(181,231,255);stop-opacity:1"></stop>
                             </linearGradient>
                         </defs>
                     </svg>
@@ -45,11 +48,18 @@
             <div class="col col-md">
                 <div class="card">
                     <h6 class="card-title">Categories</h6>
-                    <div class="loader mx-auto"><div></div><div></div><div></div></div>
+                    <div class="loader mx-auto">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                     <div id="options">
                         <h6 id="toggleOptionsButtons" class="text-center mb-4" style="visibility: hidden">
-                            <button class="buttonToggle  optionToggle left" disabled onclick="toggleOptions(this)">Personal characteristics</button><!--
-                        --><button class="buttonToggle optionToggle right" onclick="toggleOptions(this)">Countries and regions</button>
+                            <button class="buttonToggle  optionToggle left" disabled onclick="toggleOptions(this)">
+                                Personal characteristics</button><!--
+                        --><button class="buttonToggle optionToggle right" onclick="toggleOptions(this)">Countries and
+                                regions
+                            </button>
                         </h6>
                         <div id="characteristics"></div>
                         <div id="countries"></div>
@@ -70,16 +80,19 @@
                                 <text x="345" y="17">UK average</text>
                             </svg>
                         </p>
-                    <p class="mt-5">
-                        The chart above shows average anxiety level in each category. Where 0 is 'not at all anxious' and 10 is 'completely anxious'.
-                        <br>Switch through categories via menu on the right.
-                       <br><br>
-                        Hover over bars to display details and calculate answer distribution. <br><br>
-                        <b>Very low:</b> 0-1<br>
-                        <b>Low:</b> 2-3<br>
-                        <b>Medium:</b> 3-5 <br>
-                        <b>High:</b> 6-10 <br>
-                    </p>
+                        <p class="mt-4">
+                            <br>
+                            The chart above shows average anxiety level in each category, in time period March 2012 -
+                            April 2015;
+                            <br>where 0 is 'not at all anxious' and 10 is 'completely anxious'.
+                            <br>Switch through categories via menu on the right.
+                            <br><br>
+                            Hover over bars to display details and calculate answer distribution. <br><br>
+                            <b>Very low:</b> 0-1<br>
+                            <b>Low:</b> 2-3<br>
+                            <b>Medium:</b> 3-5 <br>
+                            <b>High:</b> 6-10 <br>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -99,24 +112,116 @@
 
     <div id="reportTab" class="row no-gutters tab mt-3">
         <div class="col">
-            <div class="card">
+            <div class="card py-5">
                 <h6 class="card-title">Visualisation report</h6>
-                <div class="card-body">
+                <div class="card-body mt-3">
                     <h5>Introduction</h5>
                     <p>
-                        Lorem ipsum
+                        Mental health is crucial to one’s wellbeing and overall life quality. As the importance of a
+                        healthy mind is being discovered at an increasing rate, more and more attention is focused on
+                        the research and promotion of personal wellbeing. According to Adult Psychiatric Morbidity
+                        Survey, the number of people with severe symptoms of common mental disorders have been
+                        increasing with time, raising from 6.9% in 1993 to 9.3% in 2014 and the disorder most common in
+                        the UK is the Generic Anxiety Disorder (GAD)<sup>[1]</sup>. Anxiety can have a negative impact
+                        on person’s physical health, inter-personal relationships and, consequently, functioning in a
+                        society. Therefore, it can be observed that more and more effort is put into preventing and
+                        treating GAD. One of the steps in achieving this, is to investigate what influences one’s mental
+                        state, which will then serve as a basis for identifying which areas might be used to counteract
+                        the disorder.
+                        <br>
+                        This work intends to explore this subject and communicate the findings, by looking for patterns
+                        and posing the questions <b>“Which factors influence anxiety? What connection is there between
+                        socio-demographic factors and anxiety prevalence?”</b>
+                        <br><br>
+                        The project uses data from the National Office for Statistics<sup>[2]</sup>, aggregating two
+                        data sets. The
+                        first dataset showcases estimated anxiety level among respondents, grouped by personal
+                        characteristic, and the other groups respondents by geographic location (Counties, Unitary
+                        Authorities and Local Authority Districts). The data included in those data sets comes from the
+                        Annual Population Survey and covers the time period from April 2012 to March 2015. The
+                        respondents were asked the question "Overall, how anxious did you feel yesterday? Where 0 is
+                        'not at all anxious' and 10 is 'completely anxious'".
+                        <br><br>
+                        Please note the data which was categorised as not reliable (with the coefficient of varation
+                        (CV)
+                        > 20% or insufficient) was omitted in this visualisation.
                     </p>
-                    <h5>Results</h5>
+                    <h5 class="mt-5">Results</h5>
                     <p>
-                        Lorem ipsum
+                        The visualisation comprises of a bar chart, illustrating anxiety level in various groups of
+                        respondents. The height of each bar represents the average (mean) rating for each group.
+                        Additionally, a line was added representing the average anxiety level of overall UK population.
+                        Such visualisation allows to easily compare the anxiety level between different groups in each
+                        category and to the national level. Consequently, it may serve as a tool to identify the factors
+                        correlated with higher anxiety levels.
+                        <br><br>
+                        For example, we can see that the groups with the highest anxiety levels are the ones in which
+                        the general health is low - bad self-reported health and sick as the reason for economic
+                        inactivity. Those groups are significantly above the national level - the average of those
+                        groups range between 4.60 and 5.27, with national average of 2.9. Whereas other groups deviate
+                        from the average with much smaller values. Therefore, it can be concluded that the factor
+                        influencing anxiety the most is the overall health.
+                        <br><br>
+                        Moreover, hovering over each bar generates additional charts illustrating the answer
+                        distribution. It is depicted on both, bar chart and pie chart, as the pie chart seems to more
+                        appropriate for answer distribution, however some may find trouble in reading angles
+                        accurately<sup>[3]</sup>. The visualisation of answer distribution gives a more detailed insight
+                        into the anxiety levels among the respondents. For example, anxiety average of 3.11 in 40-44 age
+                        group might seem to be fair and not worrying. However, the answer distribution shows that more
+                        than 20%, that is 1 in 5, indicated to have a <b>high</b> level of anxiety. Additionally, the
+                        national average of 2.93 is (relatively) significantly lower than in the 40-44 group, however
+                        the percentage of respondents with high anxiety level is only 0.0131 lower, still staying at
+                        prevalence of 1 in 5 people.
                     </p>
-                    <h5>Discussion</h5>
+                    <h5 class="mt-5">Discussion</h5>
                     <p>
-                        Lorem ipsum
+                        This visualisation of socio-demographic factors and anxiety prevalence has its strengths by
+                        offering a clear view on comparison between various groups of population, including geographic
+                        regions, as well as the national average. Nevertheless, it has its limitations in the lack of
+                        the depiction of change over time, as well as the disadvantage of the data covering a limited
+                        period of time, as the most recent data is from the year 2015.
+                        <br>
+                        Moreover, with hindsight it appears that the geographic categories could be depicted more
+                        effectively in a different kind of chart, as the current visualisation offers a limited view
+                        into anxiety prevalence in geographic regions. It shows the average level of anxiety in each
+                        region, however the factors behind this level remain unknown.
+                        <br><br>
+                        One surprising result is that the deviations of the average anxiety level from the national
+                        average tend to be quite small. This can indicate that the socio-demographic factors do not have
+                        too much influence on anxiety prevalence and other factors might be beneficial to explore.
                     </p>
-                    <h5>Conclusion</h5>
+                    <h5 class="mt-5">Conclusion</h5>
                     <p>
-                        Lorem ipsum
+                        In conclusion, the implemented visualisation achieves its objective of exploring the effects of
+                        socio-demographic factors on anxiety level. It can be used to compare the average levels in
+                        various groups of respondents and to learn about the percentage of people in each group with
+                        high, medium, low or very low anxiety.
+                        <br>
+                        Nevertheless, given the limitations described in the previous section, there are areas for
+                        improvement. For example, it would surely be useful to include charts illustrating the level of
+                        anxiety in each group in different years. Unfortunately, the nature of the data sets results in
+                        insufficient information, as the answers from March 2012 and April 2015 are aggregated into
+                        singular value for the whole period.
+                        <br>
+                        Moroever, another further improvement could be to present the geographic categories in the form
+                        of a scatter chart, as it would allow to also depict the size (or other attribute) of the
+                        geographic regions. Consequently, it could help with the interpretation of the results and allow
+                        to discover possible correlations between the environmental factors and the anxiety level, if
+                        any. In order to do so, it would be necessary to gather data on the size of each geographic
+                        entity from another data source, as the current set informs only about the sample size of each
+                        category.
+                    </p>
+                    <h5 class="mt-5">References</h5>
+                    <p style="text-align: left">
+                        [1]  Sally McManus, Paul Bebbington, Rachel Jenkins, and Traolach Brugha. Mental health and
+                        wellbeing in england: Adult psychiatric morbidity survey 2014, 2016.
+                        <br>[2] Silvia Manclossi. Measuring national well-being: Anxiety, 2017. Available at:
+                        <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/wellbeing/datasets/measuringnationalwellbeinganxiety">
+                            www.ons.gov.uk/peoplepopulationandcommunity
+                        </a>
+                        <br>[3] Holtz, Yan and Healy, Conor. The Issue With Pie Chart. From Data to Viz, 2018. Available
+                        at: <a
+                            href="https://www.data-to-viz.com/caveat/pie.html">www.data-to-viz.com/caveat/pie.html</a>
                     </p>
                 </div>
             </div>
@@ -129,7 +234,18 @@
                 <h6 class="card-title">Literature resources</h6>
                 <div class="card-body">
                     <p>
-                        Lorem ipsum
+                        The general design of the visualisation page was freely inspired by <a
+                            href="https://dribbble.com/shots/4210793-Sharing-Analytics-Transition-effect?utm_source=Clipboard_Shot&utm_campaign=murynmukha&utm_content=Sharing%20Analytics%20-%20Transition%20effect&utm_medium=Social_Share">Gregory
+                        Muryn-Mukha's design</a>. The rotated axis labels were generated following <a
+                            href="https://bl.ocks.org/d3noob/ccdcb7673cdb3a796e13">the example</a> on bl.ocks.org.
+                        Moreover, the svg gradient on bars was generated using <a
+                            href="https://angrytools.com/gradient/">the angrytools' gradient tool</a> and the loading
+                        spinners (visible when data takes a while to load and format) were taken from <a
+                            href="https://loading.io/css/">loading.io page</a>. The colour scale for answer distribution
+                        charts were made following <a href="https://www.d3-graph-gallery.com/graph/custom_color.html">the
+                        tutorial</a> from d3-graph-gallery.com. Moreover, the transitions on those graphs were made
+                        following <a href="https://bl.ocks.org/adamjanes/5e53cfa2ef3d3f05828020315a3ba18c">this
+                        tutorial</a> from bl.ocks.org.
                     </p>
                 </div>
             </div>

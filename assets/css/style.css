@@ -2,8 +2,8 @@
     --bg-color: #F9F9F9;
     --card-bg-color: #fff;
     --text-color: #2e2e2e;
-    --accent-color: #78CDD7;
-    --accent2-color: #F25757;
+    --accent-color: #2898CC;
+    --accent2-color: #FF6666;
     --link-color: #666c6d;
     --hover-color: #a4afb0;
 }
@@ -37,7 +37,7 @@ svg text {
 }
 
 h5 {
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-weight: 700;
 }
 
@@ -101,6 +101,39 @@ h5 {
     line-height: 150%;
     height: 310px;
 }
+
+.card-body.key rect.more {
+    cursor: default;
+}
+
+.card-body.key text {
+    text-transform: none;
+}
+
+#reportTab .card {
+    font-size: 1.2em;
+    padding-left: 8rem;
+    padding-right: 8rem;
+    line-height: 200%;
+    text-align: justify;
+}
+
+#reportTab .card-title {
+    text-align: center;
+}
+
+#litTab .card {
+    font-size: 1.2em;
+    padding-left: 8rem;
+    padding-right: 8rem;
+    line-height: 200%;
+    text-align: justify;
+}
+
+#litTab .card-title {
+    text-align: center;
+}
+
 
 /* Tabs */
 

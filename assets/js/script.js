@@ -169,8 +169,7 @@ function updateAverageChart(set, setName, isGeo) {
     drawAverage(svg, y(ukAverage.average));
 
     // Draw bars
-    let attachData = svg.selectAll("rect").data(set);
-    attachData
+    let bars = svg.selectAll("rect").data(set)
         .join("rect")
         .on("click", d => {
             if (isGeo) {
@@ -184,13 +183,18 @@ function updateAverageChart(set, setName, isGeo) {
         })
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
-        .transition()
-        .duration(2000)
         .attr("class", d => {return (isExpandable(d, isGeo)) ? "bar more" : "bar"})
         .attr("x", d => x(d[xDomainCol]))
-        .attr("y", d => y(d[yDomainCol]))
+        .attr("y", avgChartHeight)
         .attr("width", x.bandwidth())
-        .attr("height", d => avgChartHeight - y(d[yDomainCol]));
+        .attr("height", 0);
+
+    bars.transition().duration(1000)
+        .attr("y", d => y(d[yDomainCol]))
+        .attr("height", d => avgChartHeight - y(d[yDomainCol]))
+        .delay((d,i) => {
+            return i * 20
+        });
 
     // Move average line to top
     moveToTopById("avgLineLabel");

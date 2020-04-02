@@ -82,6 +82,9 @@ function loadGeoData(fileSrc) {
         }
     }).then(() => {
         let keys = Object.keys(countries);
+        keys.forEach(d => {
+            countries[d] = sortAscending(countries[d], "area names");
+        });
         keys.unshift("United Kingdom");
         createRadioButtons(keys, "countries", countries);
 
@@ -259,14 +262,18 @@ function expandCountry(d) {
             r.getElementsByTagName("input")[0].checked = r.getElementsByTagName("label")[0].innerHTML === setName;
         });
 
-        set = countries;
+        set = countries[setName];
     } else if (code.substring(0, 8) === "E1200000") {
-        set = englishRegions;
+        set = sortAscending(englishRegions[setName], "area names");
     } else {
         return;
     }
     document.getElementById("parentCat").innerText = setName;
-    updateAverageChart(set[setName], setName, true);
+    updateAverageChart(set, setName, true);
+}
+
+function sortAscending(set, columnName) {
+    return set.slice().sort((a, b) => d3.ascending(a[columnName], b[columnName]));
 }
 
 function moveToTopById(id) {

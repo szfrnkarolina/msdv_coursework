@@ -157,10 +157,10 @@ function updateAverageChart(set, setName, isGeo) {
     }));
     xAxis.call(d3.axisBottom(x))
         .selectAll("text")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .style("text-anchor", "end")
-            .attr("transform", "rotate(-" + ((isGeo) ? 35 : 20) +")");
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .style("text-anchor", "end")
+        .attr("transform", "rotate(-" + ((isGeo) ? 35 : 20) + ")");
 
     // Update the Y axis
     y.domain([0, d3.max(set, d => {
@@ -179,14 +179,17 @@ function updateAverageChart(set, setName, isGeo) {
                 expandCountry(d)
             } else {
                 expand(d)
-            }})
+            }
+        })
         .on("mouseover", d => {
             showTooltip(d[xDomainCol], d[yDomainCol]);
             showDistribution(d, xDomainCol);
         })
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
-        .attr("class", d => {return (isExpandable(d, isGeo)) ? "bar more" : "bar"})
+        .attr("class", d => {
+            return (isExpandable(d, isGeo)) ? "bar more" : "bar"
+        })
         .attr("x", d => x(d[xDomainCol]))
         .attr("y", avgChartHeight)
         .attr("width", x.bandwidth())
@@ -195,7 +198,7 @@ function updateAverageChart(set, setName, isGeo) {
     bars.transition().duration(1000)
         .attr("y", d => y(d[yDomainCol]))
         .attr("height", d => avgChartHeight - y(d[yDomainCol]))
-        .delay((d,i) => {
+        .delay((d, i) => {
             return i * 20
         });
 
@@ -222,7 +225,7 @@ function drawAverage(svg, yCoordinate) {
         })
         .attr("id", "avgLineLabel")
         .attr("class", "averageLineLabel")
-        .attr("x", (avgChartWidth + marginAx/2))
+        .attr("x", (avgChartWidth + marginAx / 2))
         .attr("y", yCoordinate)
         .text(ukAverage.average)
         .style("text-anchor", "end");
@@ -282,7 +285,7 @@ function moveToTopById(id) {
 }
 
 function removeById(id) {
-    let toRemove= document.getElementById(id);
+    let toRemove = document.getElementById(id);
     if (toRemove) toRemove.remove();
 }
 
@@ -299,7 +302,7 @@ function showDistribution(d, domainColumn) {
             }
         }
 
-        let title ="Answer distribution: " + d[domainColumn];
+        let title = "Answer distribution: " + d[domainColumn];
         document.getElementById("toggleButtons").style.visibility = "visible";
         document.getElementById("titleDistribution").innerText = title;
         plotDistributionPie(distribution);
@@ -309,12 +312,12 @@ function showDistribution(d, domainColumn) {
 }
 
 function plotDistributionPie(set) {
-    if(!pieDrawn) {
+    if (!pieDrawn) {
         const radius = Math.min(distChartWidth, distChartHeight) / 2;
 
         svgDP = d3.select("#pieSvg")
             .append("g")
-            .attr("transform", "translate(" + (distChartWidth + 2* marginDx) / 2 + "," + (distChartHeight + 2 * marginDy) / 2 + ")");
+            .attr("transform", "translate(" + (distChartWidth + 2 * marginDx) / 2 + "," + (distChartHeight + 2 * marginDy) / 2 + ")");
 
         // Colour scale
         colorScale = d3.scaleOrdinal()
@@ -341,7 +344,7 @@ function updateDistributionPie(set) {
         .data(pie(set));
 
     // Animate
-    chart.transition().duration(800).attrTween("d", function(d) {
+    chart.transition().duration(800).attrTween("d", function (d) {
         let interpolate = d3.interpolate(this._current, d);
         this._current = interpolate(0);
         return (t) => arc(interpolate(t));
@@ -350,10 +353,14 @@ function updateDistributionPie(set) {
     // Draw pie chart
     chart.enter().append("path")
         .attr("d", arc)
-        .attr("fill", d => {return (colorScale(d.data.name))})
+        .attr("fill", d => {
+            return (colorScale(d.data.name))
+        })
         .attr("stroke", "#fff")
         .style("stroke-width", "1px")
-        .each(function(d) { this._current = d; });
+        .each(function (d) {
+            this._current = d;
+        });
 
 
     // Labels
@@ -361,17 +368,21 @@ function updateDistributionPie(set) {
         .selectAll("text")
         .data(pie(set))
         .join("text")
-        .text(d => {return (d.data.name + " " + d.data.value + "%")})
+        .text(d => {
+            return (d.data.name + " " + d.data.value + "%")
+        })
         .attr("class", "pieLabels")
         .transition().duration(800)
-        .attr("transform", d => {return "translate(" + arc.centroid(d) + ")";})
+        .attr("transform", d => {
+            return "translate(" + arc.centroid(d) + ")";
+        })
         .style("text-anchor", "middle")
         .style("fill", "#f9f9f9");
 
 }
 
 function plotDistributionBar(set) {
-    if(!barDrawn) {
+    if (!barDrawn) {
         plotBar("#barDSvg", distChartWidth, distChartHeight, (marginDx + 20), (marginDy));
 
         colorScale = d3.scaleOrdinal()
@@ -392,12 +403,16 @@ function updateDistributionBar(set) {
         svg = barChartD.svg;
 
     // Update the X axis
-    x.domain(set.map((d) => {return d.name}));
+    x.domain(set.map((d) => {
+        return d.name
+    }));
     xAxis.call(d3.axisBottom(x));
 
     // Update the Y axis
     y.domain([0, 100]);
-    yAxis.call(d3.axisLeft(y).tickFormat(d => {return d + "%"}));
+    yAxis.call(d3.axisLeft(y).tickFormat(d => {
+        return d + "%"
+    }));
 
     // Update bard
     let attachData = svg.selectAll("rect").data(set);
@@ -407,7 +422,9 @@ function updateDistributionBar(set) {
         .on("mousemove", () => mouseMove())
         .on("mouseout", () => mouseOut())
         .transition().duration(200)
-        .attr('fill', d => {return (colorScale(d.name))})
+        .attr('fill', d => {
+            return (colorScale(d.name))
+        })
         .attr("x", d => x(d.name))
         .attr("y", d => y(d.value))
         .attr("width", x.bandwidth())
@@ -464,19 +481,21 @@ function createRadioButtons(list, parentId, set) {
 }
 
 function displayParent(parent) {
-    let categoryName;
-    if (parent.innerText === "United Kingdom" || Object.keys(countries).includes(parent.innerText)) {
-        categoryName = "United Kingdom";
-    } else {
-        categoryName = "England";
-    }
-    changeCategory(categoryName);
+    if (parent.innerText !== "United Kingdom" ) {
+        let categoryName;
+        if (Object.keys(countries).includes(parent.innerText)) {
+            categoryName = "United Kingdom";
+        } else {
+            categoryName = "England";
+        }
+        changeCategory(categoryName);
 
-    // Check radio button
-    let radios = document.getElementsByClassName("custom-radio");
-    Array.prototype.forEach.call(radios, r => {
-        r.getElementsByTagName("input")[0].checked = r.getElementsByTagName("label")[0].innerHTML === categoryName;
-    });
+        // Check radio button
+        let radios = document.getElementsByClassName("custom-radio");
+        Array.prototype.forEach.call(radios, r => {
+            r.getElementsByTagName("input")[0].checked = r.getElementsByTagName("label")[0].innerHTML === categoryName;
+        });
+    }
 }
 
 function changeCategory(category, setIn) {
@@ -507,9 +526,9 @@ function toggleOptions(button) {
     button.disabled = true;
 
     if (className === "distToggle") {
-        displayOptions(button,"Pie chart","barDSvg","pieSvg");
+        displayOptions(button, "Pie chart", "barDSvg", "pieSvg");
     } else {
-        displayOptions(button,"Personal characteristics","countries", "characteristics");
+        displayOptions(button, "Personal characteristics", "countries", "characteristics");
     }
 }
 

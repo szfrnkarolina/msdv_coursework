@@ -1,3 +1,4 @@
+// Global variables
 let groups = {};
 let englishRegions = {};
 let countries = {};

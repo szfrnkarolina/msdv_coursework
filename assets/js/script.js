@@ -217,7 +217,10 @@ function updateAverageChart(set, setName, isGeo) {
 
             svg.selectAll(".bar")
                 .transition()
-                .duration(500)
+                .duration(1000)
+                .delay((d, i) => {
+                    return i * 10
+                })
                 .attr("x", function(d) {
                     return x(d[xDomainCol]);
                 })
@@ -235,7 +238,10 @@ function updateAverageChart(set, setName, isGeo) {
 
             svg.selectAll(".bar")
                 .transition()
-                .duration(500)
+                .duration(1000)
+                .delay((d, i) => {
+                    return i * 10
+                })
                 .attr("x", function(d) {
                     return x(d[xDomainCol]);
                 })
@@ -251,7 +257,10 @@ function updateAverageChart(set, setName, isGeo) {
 
             svg.selectAll(".bar")
                 .transition()
-                .duration(500)
+                .duration(1000)
+                .delay((d, i) => {
+                    return i * 10
+                })
                 .attr("x", function(d) {
                     return x(d[xDomainCol]);
                 })

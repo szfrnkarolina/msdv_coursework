@@ -9,7 +9,9 @@ let barChartD = {};
 let tooltip;
 let svgDP, pie, arc, colorScale;
 
-let current = "sex";
+let current = {
+    setName: "sex",
+};
 let currentDistribution = {};
 
 let pieDrawn = false;
@@ -51,7 +53,7 @@ function loadCharacteristicsData(fileSrc) {
         }
     }).then(() => {
         createRadioButtons(Object.keys(groups), "characteristics", groups);
-        plotAverageBar(groups[current]);
+        plotAverageBar(groups[current.setName]);
         loadGeoData("assets/data/anxiety_counties.csv");
     });
 }
@@ -82,9 +84,6 @@ function loadGeoData(fileSrc) {
         }
     }).then(() => {
         let keys = Object.keys(countries);
-        keys.forEach(d => {
-            countries[d] = sortAscending(countries[d], "area names");
-        });
         keys.unshift("United Kingdom");
         createRadioButtons(keys, "countries", countries);
 
@@ -137,13 +136,27 @@ function plotAverageBar(set) {
     updateAverageChart(set, "sex", set === countries);
 }
 
+function updateAxisX(x, xAxis, set, xDomainCol, isGeo) {
+    x.domain(set.map((d) => {
+        return d[xDomainCol]
+    }));
+    xAxis.call(d3.axisBottom(x))
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("class", "x-label")
+        .attr("transform", "rotate(-" + ((isGeo) ? 35 : 20) + ")")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em");
+}
+
 function updateAverageChart(set, setName, isGeo) {
     removeById("avgLine");
     removeById("avgLineLabel");
 
-    current = setName;
     let xDomainCol = (isGeo) ? "area names" : "subgroup";
     let yDomainCol = "average";
+
+    current = {setName, set, isGeo};
 
     let x = barChartA.x,
         y = barChartA.y,
@@ -152,15 +165,7 @@ function updateAverageChart(set, setName, isGeo) {
         svg = barChartA.svg;
 
     // Update the X axis
-    x.domain(set.map((d) => {
-        return d[xDomainCol]
-    }));
-    xAxis.call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .style("text-anchor", "end")
-        .attr("transform", "rotate(-" + ((isGeo) ? 35 : 20) + ")");
+    updateAxisX(x, xAxis, set, xDomainCol, isGeo);
 
     // Update the Y axis
     y.domain([0, d3.max(set, d => {
@@ -200,6 +205,56 @@ function updateAverageChart(set, setName, isGeo) {
         .attr("height", d => avgChartHeight - y(d[yDomainCol]))
         .delay((d, i) => {
             return i * 20
+        });
+
+    d3.select("#sortAsc")
+        .on("click", function() {
+            set.sort(function(a, b) {
+                return d3.ascending(a[yDomainCol], b[yDomainCol])
+            });
+
+            updateAxisX(x, xAxis, set, xDomainCol, isGeo);
+
+            svg.selectAll(".bar")
+                .transition()
+                .duration(500)
+                .attr("x", function(d) {
+                    return x(d[xDomainCol]);
+                })
+
+        });
+
+    d3.select("#sortDesc")
+        .on("click", function() {
+            console.log("here");
+            set.sort(function(a, b) {
+                return d3.descending(a[yDomainCol], b[yDomainCol])
+            });
+
+            updateAxisX(x, xAxis, set, xDomainCol, isGeo);
+
+            svg.selectAll(".bar")
+                .transition()
+                .duration(500)
+                .attr("x", function(d) {
+                    return x(d[xDomainCol]);
+                })
+        });
+
+    d3.select("#sortAlph")
+        .on("click", function() {
+            set.sort(function(a, b) {
+                return d3.ascending(a[xDomainCol], b[xDomainCol])
+            });
+
+            updateAxisX(x, xAxis, set, xDomainCol, isGeo);
+
+            svg.selectAll(".bar")
+                .transition()
+                .duration(500)
+                .attr("x", function(d) {
+                    return x(d[xDomainCol]);
+                })
         });
 
     // Move average line to top
@@ -267,16 +322,12 @@ function expandCountry(d) {
 
         set = countries[setName];
     } else if (code.substring(0, 8) === "E1200000") {
-        set = sortAscending(englishRegions[setName], "area names");
+        set = englishRegions[setName];
     } else {
         return;
     }
     document.getElementById("parentCat").innerText = setName;
     updateAverageChart(set, setName, true);
-}
-
-function sortAscending(set, columnName) {
-    return set.slice().sort((a, b) => d3.ascending(a[columnName], b[columnName]));
 }
 
 function moveToTopById(id) {
@@ -462,7 +513,7 @@ function createRadioButtons(list, parentId, set) {
             changeCategory(e.target.textContent, set)
         };
 
-        input.checked = (d === current);
+        input.checked = (d === current.setName);
         radio.className = "custom-control custom-radio";
         if (d.includes("reason") || set === countries && d !== "United Kingdom") {
             radio.className += " ml-4"
@@ -479,6 +530,18 @@ function createRadioButtons(list, parentId, set) {
         parent.appendChild(radio);
     });
 }
+
+// function sortUpdate(button) {
+//     let order = "";
+//     if (button.innerText.includes("alph")) {
+//         order = "alphabet"
+//     } else if ((button.innerText.includes("asc"))) {
+//         order = "asc";
+//     } else if ((button.innerText.includes("desc"))) {
+//         order = "desc";
+//     }
+//     updateAverageChart(current.set, current.setName, current.isGeo, order);
+// }
 
 function displayParent(parent) {
     if (parent.innerText !== "United Kingdom" ) {
